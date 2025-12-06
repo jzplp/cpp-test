@@ -12,4 +12,14 @@ Get-Content 1.txt | ./a.exe
 Get-Content 1.txt | ./a.exe | Out-File out.txt
 ```
 
+## MacOS环境信息
+M系列芯片，代码编辑器VSCode，操作系统自带编译器。
 
+```sh
+# 编译，生成a.out
+g++ 1.cpp -o a.out
+# 执行 输入重定向到1.txt
+./a.out < 1.txt
+# 执行 输入重定向到1.txt 输出重定向到 out.txt
+./a.out < 1.txt > out.txt
+```
