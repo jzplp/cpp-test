@@ -23,7 +23,7 @@ bool judgeEqual(int res)
   {
     num = res % 10;
     res = res / 10;
-    if (j == 0 && num == 1)
+    if (j == 0 && num == 0)
       return false;
     if (vec[2][j] == '*')
       continue;
@@ -38,18 +38,18 @@ bool judgeEqual(int res)
 // 输出获取到的数组
 void printVec()
 {
-  int i, j;
-  for (i = 0; i < 3; ++i)
+  for (int i = 0; i < 3; ++i)
   {
     for (auto ip = vec[i].begin(); ip != vec[i].end(); ++ip)
     {
       printf("%c", *ip);
     }
-    putchar(' ');
+    if (i != 2)
+      putchar(' ');
   }
 }
 
-// 判断当前数组有几个解
+// 判断当前数组有几个解 初始调用时传0 0
 int judge(int i, int j)
 {
   // printf("%d %d\n", i, j);
@@ -82,7 +82,7 @@ int judge(int i, int j)
 // i，j 目前到第几个数字 num 还有几个数字需要变换
 int tryLoop(int i, int j, int num, int remain)
 {
-  if (i > 2)
+  if (i > 2 || num == 0)
   {
     int res = judge(0, 0);
     if (res == 1)
@@ -93,8 +93,6 @@ int tryLoop(int i, int j, int num, int remain)
   {
     return tryLoop(i + 1, 0, num, remain);
   }
-  if (num == 0)
-    return tryLoop(i, j + 1, 0, remain - 1);
   // 优先不变化
   // printf("---- %d %d\n", num, remain);
   if (num < remain)
@@ -128,7 +126,7 @@ int tryLoop(int i, int j, int num, int remain)
 void loop()
 {
   int i, j, k;
-  for (int i = 1;; ++i)
+  for (int i = 1; i <= len; ++i)
   {
     // printf("--- %d\n", i);
     // 改变i个数字
@@ -147,7 +145,7 @@ int main()
     i = 0;
     for (j = 0; j < 3; ++j)
       vec[j].clear();
-    while (scanf("%c", &c))
+    while (scanf("%c", &c) != EOF)
     {
       // 第一个元素为0
       if (c == '0' && vec[i].size() == 0)
