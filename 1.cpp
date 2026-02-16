@@ -47,6 +47,7 @@ void printVec()
     if (i != 2)
       putchar(' ');
   }
+  putchar('\n');
 }
 
 // 判断当前数组有几个解 初始调用时传0 0
@@ -106,6 +107,8 @@ int tryLoop(int i, int j, int num, int remain)
       c = k + '0';
     if (tempValue <= c)
       continue;
+    if (j == 0 && c == '0')
+      continue;
     vec[i][j] = c;
     if (tryLoop(i, j + 1, num - 1, remain - 1))
       return true;
@@ -127,6 +130,8 @@ int tryLoop(int i, int j, int num, int remain)
     else
       c = k + '0';
     if (tempValue >= c)
+      continue;
+    if (j == 0 && c == '0')
       continue;
     vec[i][j] = c;
     if (tryLoop(i, j + 1, num - 1, remain - 1))
@@ -156,7 +161,6 @@ int main()
   char c;
   while (1)
   {
-    ++n;
     i = 0;
     for (j = 0; j < 3; ++j)
       vec[j].clear();
@@ -176,9 +180,7 @@ int main()
       vec[i].push_back(c);
     }
     len = vec[0].size() + vec[1].size() + vec[2].size();
-    if (n != 1)
-      putchar('\n');
-    printf("Case %d: ", n);
+    printf("Case %d: ", ++n);
     if (judge(0, 0) != 1)
       loop();
     printVec();
