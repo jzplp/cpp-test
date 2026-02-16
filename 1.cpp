@@ -82,24 +82,33 @@ int judge(int i, int j)
 // i，j 目前到第几个数字 num 还有几个数字需要变换
 int tryLoop(int i, int j, int num, int remain)
 {
-  if (i < 0)
+  if (i > 2)
   {
     int res = judge(0, 0);
     if (res == 1)
       return true;
     return false;
   }
-  if (j < 0)
+  if (j == vec[i].size())
   {
-    return tryLoop(i - 1, 0, num, remain);
+    return tryLoop(i + 1, 0, num, remain);
   }
   if (num == 0)
-    return tryLoop(i, j - 1, 0, remain - 1);
+    return tryLoop(i, j + 1, 0, remain - 1);
+  // 优先不变化
+  // printf("---- %d %d\n", num, remain);
+  if (num < remain)
+  {
+    if (tryLoop(i, j + 1, num, remain - 1))
+      return true;
+  }
+  // 必须变化
   int tempValue = vec[i][j];
+
   if (tempValue != '*')
   {
     vec[i][j] = '*';
-    if (tryLoop(i, j - 1, num - 1, remain - 1))
+    if (tryLoop(i, j + 1, num - 1, remain - 1))
       return true;
   }
   for (int k = '0'; k <= '9'; ++k)
@@ -107,7 +116,7 @@ int tryLoop(int i, int j, int num, int remain)
     if (tempValue != k)
     {
       vec[i][j] = k;
-      if (tryLoop(i, j - 1, num - 1, remain - 1))
+      if (tryLoop(i, j + 1, num - 1, remain - 1))
         return true;
     }
   }
@@ -122,13 +131,9 @@ void loop()
   for (int i = 1;; ++i)
   {
     // printf("--- %d\n", i);
-    // 改变i个数字 要求字典序最小，因此从后往前遍历
-    if (tryLoop(2, vec[2].size() - 1, i, len))
-    {
-      printVec();
-      putchar('\n');
+    // 改变i个数字
+    if (tryLoop(0, 0, i, len))
       return;
-    }
   }
 }
 
@@ -157,7 +162,7 @@ int main()
       }
       vec[i].push_back(c);
     }
-    len = vec[0].size() + vec[i].size() + vec[2].size();
+    len = vec[0].size() + vec[1].size() + vec[2].size();
     printf("Case %d: ", n);
     if (judge(0, 0) != 1)
       loop();
