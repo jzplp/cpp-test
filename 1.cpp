@@ -93,31 +93,46 @@ int tryLoop(int i, int j, int num, int remain)
   {
     return tryLoop(i + 1, 0, num, remain);
   }
-  // 优先不变化
-  // printf("---- %d %d\n", num, remain);
-  if (num < remain)
-  {
-    if (tryLoop(i, j + 1, num, remain - 1))
-      return true;
-  }
-  // 必须变化
-  int tempValue = vec[i][j];
 
-  if (tempValue != '*')
+  int tempValue = vec[i][j];
+  char c;
+
+  // 变化但是字典序低
+  for (int k = -1; k <= 9; ++k)
   {
-    vec[i][j] = '*';
+    if (k == -1)
+      c = '*';
+    else
+      c = k + '0';
+    if (tempValue <= c)
+      continue;
+    vec[i][j] = c;
     if (tryLoop(i, j + 1, num - 1, remain - 1))
       return true;
   }
-  for (int k = '0'; k <= '9'; ++k)
+
+  // 不变化
+  if (num < remain)
   {
-    if (tempValue != k)
-    {
-      vec[i][j] = k;
-      if (tryLoop(i, j + 1, num - 1, remain - 1))
-        return true;
-    }
+    vec[i][j] = tempValue;
+    if (tryLoop(i, j + 1, num, remain - 1))
+      return true;
   }
+
+  // 变化但是字典序高
+  for (int k = -1; k <= 9; ++k)
+  {
+    if (k == -1)
+      c = '*';
+    else
+      c = k + '0';
+    if (tempValue >= c)
+      continue;
+    vec[i][j] = c;
+    if (tryLoop(i, j + 1, num - 1, remain - 1))
+      return true;
+  }
+
   vec[i][j] = tempValue;
   return false;
 }
@@ -161,11 +176,12 @@ int main()
       vec[i].push_back(c);
     }
     len = vec[0].size() + vec[1].size() + vec[2].size();
+    if (n != 1)
+      putchar('\n');
     printf("Case %d: ", n);
     if (judge(0, 0) != 1)
       loop();
     printVec();
-    putchar('\n');
   }
   return 0;
 }
