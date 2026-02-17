@@ -1,189 +1,158 @@
 #include <stdio.h>
-#include <vector>
-using namespace std;
 
-vector<char> vec[3];
-int len;
+// 目标状态
+int goal[3][3];
+// 当前空白位置
+int empty[2];
+// 当前状态
+// stateArr[i][j]为一个立方体的状态 最后一个下标的值表示顶面/上面/右侧面三个颜色值
+int stateArr[3][3][3];
 
-int str2int(int i)
+// 四个方向移动
+int steps[4][2] = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
+// 四个方向的反向 改回去使用
+int stepsRe[4] = {1, 0, 3, 2};
+// 四个方向的原值如何覆盖为新值的对应关系
+int stepChange[4][3] = {
+    {1, 0, 2},
+    {1, 0, 2},
+    {2, 1, 0},
+    {2, 1, 0}};
+
+// 判断当前状态是否符合终点状态
+bool judge()
 {
-  int num = 0;
-  for (int j = 0; j < vec[i].size(); ++j)
+  int i, j;
+  for (i = 0; i < 3; ++i)
   {
-    num = num * 10 + (vec[i][j] - '0');
+    for (j = 0; j < 3; ++j)
+    {
+      if (goal[i][j] == 0)
+      {
+        if (i != empty[0] && j != empty[1])
+          return false;
+        continue;
+      }
+      if (goal[i][j] != stateArr[i][j][0])
+        return false;
+    }
   }
-  return num;
-}
-
-// 判断等号后面的数字是否符合要求
-bool judgeEqual(int res)
-{
-  int num;
-  for (int j = vec[2].size() - 1; j >= 0; --j)
-  {
-    num = res % 10;
-    res = res / 10;
-    if (j == 0 && num == 0)
-      return false;
-    if (vec[2][j] == '*')
-      continue;
-    if (vec[2][j] - '0' != num)
-      return false;
-  }
-  if (res)
-    return false;
   return true;
 }
 
-// 输出获取到的数组
-void printVec()
+// 输出数组，调试用
+void printArr()
 {
-  for (int i = 0; i < 3; ++i)
+  int i, j;
+  for (i = 0; i < 3; ++i)
   {
-    for (auto ip = vec[i].begin(); ip != vec[i].end(); ++ip)
-    {
-      printf("%c", *ip);
-    }
-    if (i != 2)
-      putchar(' ');
+    for (j = 0; j < 3; ++j)
+      printf("%d ", goal[i][j]);
+    putchar('\n');
   }
-  putchar('\n');
 }
-
-// 判断当前数组有几个解 初始调用时传0 0
-int judge(int i, int j)
+bool loop(int n)
 {
-  // printf("%d %d\n", i, j);
-  if (i > 1)
-  {
-    int a = str2int(0), b = str2int(1);
-    // printf("--- %d %d\n", a, b);
-    return judgeEqual(a * b) ? 1 : 0;
-  }
-  if (j >= vec[i].size())
-  {
-    return judge(i + 1, 0);
-  }
-  if (vec[i][j] == '*')
-  {
-    int res = 0;
-    for (int k = 0; k < 10; ++k)
-    {
-      if (k == 0 && j == 0)
-        continue;
-      vec[i][j] = '0' + k;
-      res += judge(i, j + 1);
-    }
-    vec[i][j] = '*';
-    return res;
-  }
-  return judge(i, j + 1);
-}
-
-// i，j 目前到第几个数字 num 还有几个数字需要变换
-int tryLoop(int i, int j, int num, int remain)
-{
-  if (i > 2 || num == 0)
-  {
-    int res = judge(0, 0);
-    if (res == 1)
-      return true;
-    return false;
-  }
-  if (j == vec[i].size())
-  {
-    return tryLoop(i + 1, 0, num, remain);
-  }
-
-  int tempValue = vec[i][j];
-  char c;
-
-  // 变化但是字典序低
-  for (int k = -1; k <= 9; ++k)
-  {
-    if (k == -1)
-      c = '*';
-    else
-      c = k + '0';
-    if (tempValue <= c)
-      continue;
-    if (j == 0 && c == '0')
-      continue;
-    vec[i][j] = c;
-    if (tryLoop(i, j + 1, num - 1, remain - 1))
-      return true;
-  }
-
-  // 不变化
-  if (num < remain)
-  {
-    vec[i][j] = tempValue;
-    if (tryLoop(i, j + 1, num, remain - 1))
-      return true;
-  }
-
-  // 变化但是字典序高
-  for (int k = -1; k <= 9; ++k)
-  {
-    if (k == -1)
-      c = '*';
-    else
-      c = k + '0';
-    if (tempValue >= c)
-      continue;
-    if (j == 0 && c == '0')
-      continue;
-    vec[i][j] = c;
-    if (tryLoop(i, j + 1, num - 1, remain - 1))
-      return true;
-  }
-
-  vec[i][j] = tempValue;
-  return false;
-}
-
-// 以改变数字个数循环
-void loop()
-{
+  printf("qqq %d\n", n);
   int i, j, k;
-  for (int i = 1; i <= len; ++i)
+  int a, b;
+  if (n == 0)
+    return judge();
+  // 四个方向遍历
+  for (i = 0; i < 4; ++i)
   {
-    // printf("--- %d\n", i);
-    // 改变i个数字
-    if (tryLoop(0, 0, i, len))
-      return;
+    // 正向旋转过去
+    // a,b 要转的位置
+    a = steps[i][0] + empty[0];
+    b = steps[i][1] + empty[1];
+    if (a < 0 || a > 2 || b < 0 || b > 2)
+      continue;
+    for (j = 0; j < 3; ++j)
+      stateArr[empty[0]][empty[1]][j] = stateArr[a][b][stepChange[i][j]];
+    empty[0] = a;
+    empty[1] = b;
+    if (loop(n - 1))
+      return true;
+
+    // 反向旋转回来
+    k = stepsRe[i];
+    a = empty[0] + steps[k][0];
+    b = empty[0] + steps[k][1];
+    for (j = 0; j < 3; ++j)
+      stateArr[empty[0]][empty[1]][j] = stateArr[a][b][stepChange[i][j]];
+    empty[0] = a;
+    empty[1] = b;
   }
+  return false;
 }
 
 int main()
 {
-  int n = 0, i, j, k;
+  int i, j, k;
   char c;
-  while (1)
+  while (scanf("%d %d", &empty[1], &empty[0]) >= 2)
   {
-    i = 0;
-    for (j = 0; j < 3; ++j)
-      vec[j].clear();
-    while (scanf("%c", &c) != EOF)
+    if (empty[0] == 0 && empty[1] == 0)
+      return 0;
+    empty[0]--;
+    empty[1]--;
+    // 读入换行符
+    getchar();
+    for (i = 0; i < 3; ++i)
     {
-      // 第一个元素为0
-      if (c == '0' && vec[i].size() == 0)
-        return 0;
-      // 一个数字输入完
-      if (c == ' ' || c == '\n')
+      for (j = 0; j < 3; ++j)
       {
-        ++i;
-        if (i == 3)
+        scanf("%c", &c);
+        // 白色1 蓝色2 红色3 空0
+        switch (c)
+        {
+        case 'W':
+          k = 1;
           break;
-        continue;
+        case 'B':
+          k = 2;
+          break;
+        case 'R':
+          k = 3;
+          break;
+        case 'E':
+          k = 0;
+          break;
+        }
+        goal[i][j] = k;
+        // 读入一个分隔符
+        getchar();
       }
-      vec[i].push_back(c);
     }
-    len = vec[0].size() + vec[1].size() + vec[2].size();
-    printf("Case %d: ", ++n);
-    if (judge(0, 0) != 1)
-      loop();
-    printVec();
+    // 初始化当前状态
+    for (i = 0; i < 3; ++i)
+    {
+      for (j = 0; j < 3; ++j)
+      {
+        stateArr[i][j][0] = 1;
+        stateArr[i][j][1] = 3;
+        stateArr[i][j][2] = 2;
+      }
+    }
+    if (judge())
+    {
+      printf("0\n");
+      continue;
+    }
+    for (i = 1; i < 31; ++i)
+    {
+      printf("---%d\n", i);
+      if (loop(i))
+        break;
+    }
+    if (i == 31)
+    {
+      printf("-1\n");
+    }
+    else
+    {
+      printf("%d\n", i);
+    }
   }
   return 0;
 }
