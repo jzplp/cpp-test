@@ -1,101 +1,441 @@
-37 59 8965
-69 16 *675
-28 80 2961
-28 56 158*
-2* 53 9678
-67 36 25*0
-*4 41 8713
-62 78 300*
-88 30 4*85
-5* 61 471*
-89 89 9534
-65 10 *337
-81 *5 2763
-80 94 *040
-68 23 3*52
-88 9* *008
-30 64 117*
-78 94 1575
-9* 93 4022
-30 74 10*4
-86 67 1391
-10 66 **59
-61 48 56*6
-6* 60 *134
-65 75 9375
-32 3* 7502
-58 78 2566
-67 5* 1*99
-75 18 1065
-76 88 9289
-*4 99 9930
-14 54 6743
-94 *7 7671
-59 52 1111
-38 1* 5936
-25 64 6985
-28 96 911*
-34 *2 71**
-88 95 31**
-18 12 1458
-32 72 8373
-81 92 6336
-93 94 1846
-33 ** 5*98
-10 *6 4195
-27 21 7831
-88 *8 6351
-59 69 75*3
-25 66 7928
-*7 43 7546
-37 ** 1190
-73 11 *549
-96 27 9699
-49 99 *929
-10 20 7626
-62 4* 1561
-*1 1* 8*44
-19 89 4331
-47 81 9933
-67 67 5311
-84 *3 1786
-57 35 6947
-69 20 4255
-87 15 2*93
-15 39 5185
-8* 69 6591
-36 77 8021
-69 30 2015
-91 69 8352
-80 96 8101
-55 78 1*59
-*1 79 5102
-22 70 2674
-18 86 7*63
-38 88 57*6
-18 83 3126
-** 22 3225
-9* 91 6611
-72 79 3611
-11 53 6876
-75 64 *230
-9* *1 2182
-81 41 3**5
-77 8* 7590
-9* 23 *886
-66 24 8689
-** 19 *583
-88 44 17*9
-40 41 4**4
-24 *6 1221
-47 3* 7368
-38 36 7*33
-5* 83 9403
-36 35 7273
-** 98 7836
-*3 43 2951
-42 ** 4236
-8* 26 2432
-94 23 5614
-80 *7 1535
-0
+1 3
+E W B
+R R R
+R W W
+2 3
+W W R
+E W W
+B B B
+3 2
+W R W
+W E R
+W B B
+3 3
+B E R
+W R B
+B W W
+2 2
+R B E
+B B R
+W W B
+2 1
+R R W
+R W E
+R R R
+2 2
+W W R
+B R E
+W B B
+3 2
+B R B
+R W B
+W E B
+3 2
+W B R
+B R B
+E W R
+3 2
+W W B
+B B B
+R B E
+2 1
+R W R
+R B W
+R W E
+3 1
+E W W
+W W R
+W B R
+3 2
+B B W
+E W B
+W W R
+2 2
+W W W
+R E W
+B B W
+1 3
+R R B
+W R E
+B W B
+3 3
+W R R
+B W E
+R W R
+3 1
+W W R
+R W E
+B R W
+3 1
+R E R
+W W B
+W R W
+2 2
+W E W
+B W B
+W B B
+2 3
+W R B
+W E W
+R W W
+1 1
+E R R
+W R R
+B R B
+2 3
+B E W
+W B B
+B W B
+1 1
+R B B
+R B E
+R B R
+3 1
+B R W
+B W E
+R W R
+1 3
+B B B
+W W E
+B W R
+1 3
+R W E
+R B B
+B W R
+1 3
+W B E
+R R W
+B B R
+1 1
+B B B
+R B B
+R E B
+1 2
+R B W
+R W R
+R B E
+2 1
+B B R
+B W R
+R B E
+2 1
+W B R
+E B B
+W R B
+2 2
+R B R
+R E W
+W R W
+2 3
+W E B
+W W R
+R B R
+3 1
+R B W
+B E B
+W B B
+3 3
+B B W
+W R W
+E R W
+3 2
+B E R
+B W B
+R W W
+2 2
+W E R
+R B R
+R R B
+2 2
+E R B
+B B W
+B R R
+2 2
+R B W
+R E B
+B B W
+1 1
+E W B
+R R W
+W W W
+3 2
+E R W
+B W R
+R B R
+1 1
+W B E
+R W B
+R B W
+2 2
+B R R
+W R E
+W B W
+1 3
+W R E
+R B R
+W W W
+2 1
+W E R
+B B B
+R R R
+2 1
+W R E
+R R R
+B B R
+3 1
+B B R
+E B W
+W R R
+2 1
+B W E
+R R B
+W W W
+3 3
+E B R
+R W W
+W B B
+2 2
+B R B
+W E R
+B R W
+2 1
+R W W
+B E B
+W W B
+3 3
+R B W
+B W W
+W B E
+1 2
+R B E
+W B R
+B B W
+3 2
+W E R
+W R R
+B R R
+1 1
+B B R
+R E R
+W W R
+3 1
+B R B
+B W B
+E B R
+2 1
+R W W
+E B W
+B W B
+2 3
+W R B
+R E B
+B B W
+3 2
+R W R
+E B W
+R B B
+1 1
+W W W
+E B R
+B B B
+1 2
+B B B
+W R R
+B E B
+1 2
+R B W
+W R B
+B E W
+1 2
+B B B
+W B E
+B B W
+1 2
+R R B
+B R W
+B E W
+2 2
+B W E
+R R B
+W B R
+3 3
+R B E
+B B W
+B B W
+1 3
+E W R
+B W R
+B W B
+1 2
+R B B
+W E R
+B W R
+2 3
+R E R
+W W B
+R R R
+2 1
+W R B
+B W R
+R W E
+1 3
+W R R
+R W W
+W E R
+2 2
+R E W
+B B R
+B R R
+1 1
+W E B
+B B R
+R W B
+2 1
+R R R
+E B R
+B R B
+2 1
+B E R
+W R R
+W B W
+1 1
+B W W
+W R B
+R E B
+1 2
+W E R
+W R R
+R B R
+2 1
+W R B
+E B W
+B R R
+3 2
+B W R
+B R W
+B E W
+3 1
+R B R
+R W E
+W R B
+2 2
+E R R
+W B R
+W B B
+1 1
+W B W
+B R B
+E B W
+3 2
+R W B
+R W E
+W W W
+2 2
+W E W
+R W R
+B W W
+2 3
+R E W
+B B R
+B R B
+2 3
+R R W
+R W B
+B E B
+2 3
+W R R
+E W R
+B R R
+1 3
+R W B
+E B W
+R B B
+2 2
+B W W
+R B W
+E W R
+3 1
+R R E
+W R R
+B W W
+3 1
+B W B
+R B W
+B E R
+3 1
+R W W
+B E B
+W R W
+3 1
+B B W
+R E W
+W W W
+3 2
+W R B
+B W W
+W W E
+1 3
+W B B
+B R E
+B B B
+1 1
+B B W
+W W W
+R E B
+1 2
+R B E
+W B W
+W W B
+3 3
+R E W
+W W R
+B B B
+3 3
+W R E
+W W W
+B B W
+1 3
+W B E
+W R W
+W W B
+1 2
+R R R
+E B W
+R R W
+1 2
+R R R
+E W B
+R W R
+1 2
+R R R
+E W W
+R R R
+3 3
+R R R
+R E R
+R R R
+1 1
+E B R
+W W W
+W W W
+1 1
+E R B
+W W W
+W W W
+1 2
+B R R
+E W B
+R W R
+1 2
+B R R
+E W W
+R R R
+1 2
+B R B
+E W W
+R R R
+1 2
+B R R
+E R W
+R R R
+0 0
