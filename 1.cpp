@@ -1,5 +1,7 @@
 #include <stdio.h>
 
+#define MAXN 31
+
 // 目标状态
 int goal[3][3];
 // 当前空白位置
@@ -29,7 +31,7 @@ bool judge()
     {
       if (goal[i][j] == 0)
       {
-        if (i != empty[0] && j != empty[1])
+        if (i != empty[0] || j != empty[1])
           return false;
         continue;
       }
@@ -51,9 +53,9 @@ void printArr()
     putchar('\n');
   }
 }
-bool loop(int n)
+bool loop(int n, int preStep)
 {
-  printf("qqq %d\n", n);
+  // printf("qqq %d\n", n);
   int i, j, k;
   int a, b;
   if (n == 0)
@@ -61,6 +63,8 @@ bool loop(int n)
   // 四个方向遍历
   for (i = 0; i < 4; ++i)
   {
+    if (preStep != -1 && i == stepsRe[preStep])
+      continue;
     // 正向旋转过去
     // a,b 要转的位置
     a = steps[i][0] + empty[0];
@@ -71,15 +75,16 @@ bool loop(int n)
       stateArr[empty[0]][empty[1]][j] = stateArr[a][b][stepChange[i][j]];
     empty[0] = a;
     empty[1] = b;
-    if (loop(n - 1))
+
+    if (loop(n - 1, i))
       return true;
 
     // 反向旋转回来
     k = stepsRe[i];
     a = empty[0] + steps[k][0];
-    b = empty[0] + steps[k][1];
+    b = empty[1] + steps[k][1];
     for (j = 0; j < 3; ++j)
-      stateArr[empty[0]][empty[1]][j] = stateArr[a][b][stepChange[i][j]];
+      stateArr[empty[0]][empty[1]][j] = stateArr[a][b][stepChange[k][j]];
     empty[0] = a;
     empty[1] = b;
   }
@@ -92,7 +97,7 @@ int main()
   char c;
   while (scanf("%d %d", &empty[1], &empty[0]) >= 2)
   {
-    if (empty[0] == 0 && empty[1] == 0)
+    if (empty[0] == 0 || empty[1] == 0)
       return 0;
     empty[0]--;
     empty[1]--;
@@ -139,13 +144,14 @@ int main()
       printf("0\n");
       continue;
     }
-    for (i = 1; i < 31; ++i)
+    // todo 缩小调试
+    for (i = 1; i < MAXN; ++i)
     {
-      printf("---%d\n", i);
-      if (loop(i))
+      // printf("---%d\n", i);
+      if (loop(i, -1))
         break;
     }
-    if (i == 31)
+    if (i == MAXN)
     {
       printf("-1\n");
     }
