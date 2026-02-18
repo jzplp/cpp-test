@@ -1,4 +1,5 @@
 #include <stdio.h>
+#define MAXN 31
 
 // 目标状态
 int goal[3][3];
@@ -7,8 +8,6 @@ int emptyPos[2];
 // 当前状态
 // stateArr[i][j]为一个立方体的状态 最后一个下标的值表示顶面/上面/右侧面三个颜色值
 int stateArr[3][3][3];
-
-int minStep = 31;
 
 // 四个方向移动
 int steps[4][2] = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
@@ -37,22 +36,16 @@ int judge()
   return n;
 }
 
-void dfs(int step, int preStep)
+bool loop(int n, int preStep)
 {
-  if (step >= minStep)
-    return;
+  int i, j, k;
+  int a, b;
+  int preA = emptyPos[0], preB = emptyPos[1];
   int jnum = judge();
   if (jnum == 0)
-  {
-    minStep = step;
-    return;
-  }
-  // step + 1 + jnum - 1
-  if (step + jnum > 30)
-    return;
-
-  int preA = emptyPos[0], preB = emptyPos[1];
-  int i, j, k, a, b;
+    return true;
+  if (n <= 0 || n + 2 < jnum)
+    return false;
   // 四个方向遍历
   for (i = 0; i < 4; ++i)
   {
@@ -70,15 +63,18 @@ void dfs(int step, int preStep)
     emptyPos[1] = b;
     stateArr[a][b][0] = 0;
 
-    dfs(step + 1, i);
+    if (loop(n - 1, i))
+      return true;
 
     // 反向旋转回来
+    k = stepsRe[i];
     for (j = 0; j < 3; ++j)
-      stateArr[a][b][j] = stateArr[preA][preB][stepChange[stepsRe[i]][j]];
+      stateArr[a][b][j] = stateArr[preA][preB][stepChange[k][j]];
     emptyPos[0] = preA;
     emptyPos[1] = preB;
     stateArr[preA][preB][0] = 0;
   }
+  return false;
 }
 
 int main()
@@ -87,7 +83,6 @@ int main()
   char c;
   while (scanf("%d %d", &emptyPos[1], &emptyPos[0]) == 2)
   {
-    minStep = 1000;
     if (emptyPos[0] == 0 || emptyPos[1] == 0)
       return 0;
     emptyPos[0]--;
@@ -131,12 +126,15 @@ int main()
       }
     }
     stateArr[emptyPos[0]][emptyPos[1]][0] = 0;
-    dfs(0, -1);
-
-    if (minStep > 30)
+    for (i = 0; i < MAXN; ++i)
+    {
+      if (loop(i, -1))
+        break;
+    }
+    if (i == MAXN)
       printf("-1\n");
     else
-      printf("%d\n", minStep);
+      printf("%d\n", i);
   }
   return 0;
 }
