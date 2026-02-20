@@ -1,36 +1,54 @@
 #include <stdio.h>
 #include <string.h>
-#include <map>
+#include <queue>
 #include <vector>
-#define MAXLEN 10000
 using namespace std;
 
 int n, m, s, t;
 vector<int> graph[20];
 // 0 空白 1 石头 2 机器人
 int vertices[20];
-int mp[40000][16];
+bool foundFlag;
 
-int stepsMin[MAXLEN];
-int stepsMinLen;
-int steps[MAXLEN];
-int stepsLen;
+int paths[400000];
 
-void copyStepMin()
+struct Path
 {
-  for (int i = 0; i < stepsLen; ++i)
-    stepsMin[i] = steps[i];
-  stepsMinLen = stepsLen;
+  bool has;     // 是否已经访问过
+  int preNode;  // 上一个节点的二进制值
+  int preRobot; // 上一个节点的机器位置
+  int stepBeg;  // 这一步起点
+  int stepEnd;  // 这一步终点
+};
+
+struct Node
+{
+  int node;     // 节点的二进制值
+  int robot;    // 节点的机器位置
+  int stepBeg;  // 这一步起点
+  int stepEnd;  // 这一步终点
+  int num;      // 当前步数
+  int preNode;  // 上一个节点的二进制值
+  int preRobot; // 上一个节点的机器位置
+};
+
+queue<Node> qu;
+
+// 是否访问过这个状态
+Path mp[40000][16];
+
+void setPaths(Node no)
+{
+  int i, j, k;
+  Path p = mp[no.node][no.robot];
+  for (i = no.num - 1; i >= 0; --i)
+  {
+    paths[i] = p.stepBeg + p.stepEnd * 20;
+    p = mp[p.preNode][p.preRobot];
+  }
 }
 
-void printVertices()
-{
-  for (int i = 0; i < n; ++i)
-    printf("%d ", vertices[i]);
-  putchar('\n');
-}
-
-bool hasMap()
+int setRawVertices()
 {
   int num = 0;
   for (int i = 0; i < n; ++i)
@@ -40,56 +58,62 @@ bool hasMap()
     else
       num = num * 2;
   }
-
-  if (mp[num][s] && mp[num][s] <= stepsLen)
-    return true;
-  mp[num][s] = stepsLen;
-  return false;
+  return num;
 }
 
-void loop(int preStep)
+void getRawVertices(int node, int robot)
 {
-  if (stepsMinLen != 0 && stepsLen >= stepsMinLen)
-    return;
-  if (s == t)
+  int a, b;
+  for (int i = n - 1; i >= 0; --i)
   {
-    copyStepMin();
-    return;
+    a = node % 2;
+    node = node / 2;
+    vertices[i] = a;
   }
-  if (hasMap())
-    return;
-  int preBeg = preStep % 20, preEnd = preStep / 20;
-  int i, jp, k, j;
-  for (i = 0; i < n; ++i)
+  vertices[robot] = 2;
+}
+
+Node bfs()
+{
+  int i, j, jp, k;
+  Node no = {setRawVertices(), s, 0, 0, 0, 0, 0};
+  qu.push(no);
+  while (qu.size())
   {
-    if (vertices[i] == 0)
+    no = qu.front();
+    qu.pop();
+    if (mp[no.node][no.robot].has)
       continue;
-
-    for (jp = 0; jp < graph[i].size(); ++jp)
+    mp[no.node][no.robot] = {true, no.preNode, no.preRobot, no.stepBeg, no.stepEnd};
+    if (no.robot == t)
     {
-      j = graph[i][jp];
-      if (vertices[j])
+      foundFlag = true;
+      return no;
+    }
+    getRawVertices(no.node, no.robot);
+    for (i = 0; i < n; ++i)
+    {
+      if (!vertices[i])
         continue;
-      // 走回去
-      if (i == preEnd && j == preBeg)
-        continue;
-      vertices[j] = vertices[i];
-      vertices[i] = 0;
-      k = j * 20 + i;
-      if (i == s)
-        s = j;
-      steps[stepsLen] = k;
-      stepsLen++;
-      loop(k);
-
-      // 恢复原状
-      stepsLen--;
-      if (j == s)
-        s = i;
-      vertices[i] = vertices[j];
-      vertices[j] = 0;
+      for (jp = 0; jp < graph[i].size(); ++jp)
+      {
+        j = graph[i][jp];
+        if (vertices[j])
+          continue;
+        vertices[j] = vertices[i];
+        vertices[i] = 0;
+        Node newNode = {
+            setRawVertices(),
+            (i == no.robot ? j : no.robot),
+            i, j, no.num + 1, no.node, no.robot};
+        qu.push(newNode);
+        // 改回去
+        vertices[i] = vertices[j];
+        vertices[j] = 0;
+      }
     }
   }
+  return {};
 }
 
 int main()
@@ -100,12 +124,11 @@ int main()
   {
     for (i = 0; i < 20; ++i)
       graph[i].clear();
+    queue<Node>().swap(qu);
     memset(vertices, 0, sizeof(vertices));
-    memset(stepsMin, 0, sizeof(stepsMin));
-    memset(steps, 0, sizeof(steps));
-    stepsMinLen = 0;
-    stepsLen = 0;
     memset(mp, 0, sizeof(mp));
+    memset(paths, 0, sizeof(paths));
+    foundFlag = false;
     scanf("%d %d %d %d", &n, &m, &s, &t);
     s = s - 1;
     t = t - 1;
@@ -128,13 +151,16 @@ int main()
       printf("Case %d: 0\n\n", k);
       continue;
     }
-    loop(-1);
-    printf("Case %d: %d\n", k, (stepsMinLen == 0 ? -1 : stepsMinLen));
-    if (stepsMinLen != MAXLEN)
+    Node no = bfs();
+    if (!foundFlag)
     {
-      for (i = 0; i < stepsMinLen; ++i)
-        printf("%d %d\n", stepsMin[i] % 20 + 1, stepsMin[i] / 20 + 1);
+      printf("Case %d: -1\n\n", k);
+      continue;
     }
+    setPaths(no);
+    printf("Case %d: %d\n", k, no.num);
+    for (i = 0; i < no.num; ++i)
+      printf("%d %d\n", paths[i] % 20 + 1, paths[i] / 20 + 1);
     putchar('\n');
   }
 
