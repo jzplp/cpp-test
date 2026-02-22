@@ -1,168 +1,248 @@
 #include <stdio.h>
 #include <string.h>
 #include <queue>
-#include <vector>
+
 using namespace std;
 
-int n, m, s, t;
-vector<int> graph[20];
-// 0 空白 1 石头 2 机器人
-int vertices[20];
-bool foundFlag;
+// 数组
+int arr[5][5];
+// 数组
+int arrNew[5][5];
+// 编号对应数组的下标 i*10+j 编号从0开始
+int arrIndex[15] = {0, 10, 1, 20, 11, 2, 30, 21, 12, 3, 40, 31, 22, 13, 4};
+// 数组下标对应编号
+int arrReIndex[100];
+// 六个方向
+int steps[6][2] = {{-1, 0}, {-1, 1}, {0, 1}, {1, 0}, {1, -1}, {0, -1}};
+int endi, endj;
 
-int paths[400000];
+int indexResL[10000][2];
+int indexResR[10000][2];
+int len;
 
 struct Path
 {
-  bool has;     // 是否已经访问过
-  int preNode;  // 上一个节点的二进制值
-  int preRobot; // 上一个节点的机器位置
-  int stepBeg;  // 这一步起点
-  int stepEnd;  // 这一步终点
+  // 是否查找到
+  bool isFind;
+  // 上一步的路径
+  int preStatus;
+  // 起始点
+  int i1, j1;
+  // 终点
+  int i2, j2;
+  // 步数
+  int num;
 };
+
+// 状态是否访问过
+Path map[40000];
 
 struct Node
 {
-  int node;     // 节点的二进制值
-  int robot;    // 节点的机器位置
-  int stepBeg;  // 这一步起点
-  int stepEnd;  // 这一步终点
-  int num;      // 当前步数
-  int preNode;  // 上一个节点的二进制值
-  int preRobot; // 上一个节点的机器位置
+  // 状态
+  int status;
+  // 步数
+  int num;
 };
 
 queue<Node> qu;
 
-// 是否访问过这个状态
-Path mp[40000][16];
-
-void setPaths(Node no)
+void setRes(Path p, bool flag = false)
 {
-  int i, j, k;
-  Path p = mp[no.node][no.robot];
-  for (i = no.num - 1; i >= 0; --i)
+  for (int i = p.num - 1; i >= 0; --i)
   {
-    paths[i] = p.stepBeg + p.stepEnd * 20;
-    p = mp[p.preNode][p.preRobot];
+    if (!flag)
+    {
+      indexResL[i][0] = arrReIndex[p.i1 * 10 + p.j1];
+      indexResL[i][1] = arrReIndex[p.i2 * 10 + p.j2];
+    }
+    else
+    {
+      indexResR[i][0] = arrReIndex[p.i1 * 10 + p.j1];
+      indexResR[i][1] = arrReIndex[p.i2 * 10 + p.j2];
+    }
+    p = map[p.preStatus];
   }
 }
 
-int setRawVertices()
+bool compare(int num)
 {
-  int num = 0;
-  for (int i = 0; i < n; ++i)
+  for (int i = 0; i < num; ++i)
   {
-    if (vertices[i] == 1)
-      num = num * 2 + 1;
-    else
-      num = num * 2;
+    if (indexResL[i][0] > indexResR[i][0])
+      return true;
+    if (indexResL[i][0] < indexResR[i][0])
+      return false;
+    if (indexResL[i][1] > indexResR[i][1])
+      return true;
+    if (indexResL[i][1] < indexResR[i][1])
+      return false;
+  }
+  return false;
+}
+
+bool judge()
+{
+  int i, j, k;
+  for (i = 0; i < 5; ++i)
+  {
+    for (j = 0; j < (5 - i); ++j)
+      if (i == endi && j == endj)
+      {
+        if (arr[i][j] == 0)
+          return false;
+      }
+      else
+      {
+        if (arr[i][j] != 0)
+          return false;
+      }
+  }
+  return true;
+}
+
+int arr2Int(bool isNew)
+{
+  int i, j, num = 0;
+  for (i = 0; i < 5; ++i)
+  {
+    for (j = 0; j < (5 - i); ++j)
+      num = num * 2 + (isNew ? arrNew[i][j] : arr[i][j]);
   }
   return num;
 }
 
-void getRawVertices(int node, int robot)
+void int2Arr(int num)
 {
-  int a, b;
-  for (int i = n - 1; i >= 0; --i)
+  int i, j, k;
+  for (i = 4; i >= 0; --i)
   {
-    a = node % 2;
-    node = node / 2;
-    vertices[i] = a;
+    for (j = (5 - i) - 1; j >= 0; --j)
+    {
+      arr[i][j] = num % 2;
+      num /= 2;
+    }
   }
-  vertices[robot] = 2;
 }
 
-Node bfs()
+void resetArrNew()
 {
-  int i, j, jp, k;
-  Node no = {setRawVertices(), s, 0, 0, 0, 0, 0};
-  qu.push(no);
-  while (qu.size())
+  int i, j;
+  for (i = 0; i < 5; ++i)
+    for (j = 0; j < (5 - i); ++j)
+      arrNew[i][j] = arr[i][j];
+}
+
+void bfs()
+{
+  int i1, i2, i3, i4, flag;
+  int a, b;
+  Node no;
+  qu.push({arr2Int(false), 0});
+  while (!qu.empty())
   {
     no = qu.front();
     qu.pop();
-    if (mp[no.node][no.robot].has)
-      continue;
-    mp[no.node][no.robot] = {true, no.preNode, no.preRobot, no.stepBeg, no.stepEnd};
-    if (no.robot == t)
+    int2Arr(no.status);
+    if (len && len < no.num)
+      return;
+    if (judge())
     {
-      foundFlag = true;
-      return no;
+      len = no.num;
+      setRes(map[no.status]);
+      return;
     }
-    getRawVertices(no.node, no.robot);
-    for (i = 0; i < n; ++i)
+    for (i1 = 0; i1 < 5; ++i1)
     {
-      if (!vertices[i])
-        continue;
-      for (jp = 0; jp < graph[i].size(); ++jp)
+      for (i2 = 0; i2 < (5 - i1); ++i2)
       {
-        j = graph[i][jp];
-        if (vertices[j])
+        if (!arr[i1][i2])
           continue;
-        vertices[j] = vertices[i];
-        vertices[i] = 0;
-        Node newNode = {
-            setRawVertices(),
-            (i == no.robot ? j : no.robot),
-            i, j, no.num + 1, no.node, no.robot};
-        qu.push(newNode);
-        // 改回去
-        vertices[i] = vertices[j];
-        vertices[j] = 0;
+        for (i3 = 0; i3 < 6; ++i3)
+        {
+          resetArrNew();
+          a = i1;
+          b = i2;
+          flag = 0;
+          for (i4 = 0;; ++i4)
+          {
+            a = a + steps[i3][0];
+            b = b + steps[i3][1];
+            if (a < 0 || b < 0 || a >= 5 || b >= (5 - a))
+              break;
+            if (arrNew[a][b] == 0)
+            {
+              flag = 1;
+              break;
+            }
+            if (arrNew[a][b] == 1)
+              arrNew[a][b] = 0;
+          }
+          if (flag && i4 > 0)
+          {
+            arrNew[a][b] = 1;
+            arrNew[i1][i2] = 0;
+            int status = arr2Int(true);
+            Path p = {true, no.status, i1, i2, a, b, no.num + 1};
+            if (!map[status].isFind)
+            {
+              qu.push({status, no.num + 1});
+              map[status] = p;
+              continue;
+            }
+            // 设置map的逻辑 按照序号字典序表示优先级
+            if (map[status].num < (no.num + 1))
+              continue;
+
+            setRes(map[status]);
+            setRes(p, true);
+            if (compare(no.num + 1))
+            {
+              map[status] = p;
+            }
+          }
+        }
       }
     }
   }
-  return {};
 }
 
 int main()
 {
-  int T, i, j, k = 0, a, b;
+  int T = 0, i, j, k;
+  memset(arrReIndex, 0, sizeof(arrReIndex));
+  for (i = 0; i < 15; ++i)
+    arrReIndex[arrIndex[i]] = i;
   scanf("%d", &T);
-  while (++k <= T)
+  while (T--)
   {
-    for (i = 0; i < 20; ++i)
-      graph[i].clear();
+    for (i = 0; i < 5; ++i)
+    {
+      for (j = 0; j < 5; ++j)
+        arr[i][j] = 1;
+    }
+    memset(map, 0, sizeof(map));
+    len = 0;
     queue<Node>().swap(qu);
-    memset(vertices, 0, sizeof(vertices));
-    memset(mp, 0, sizeof(mp));
-    memset(paths, 0, sizeof(paths));
-    foundFlag = false;
-    scanf("%d %d %d %d", &n, &m, &s, &t);
-    s = s - 1;
-    t = t - 1;
-    for (i = 0; i < m; ++i)
+    scanf("%d", &k);
+    k -= 1;
+    endi = arrIndex[k] / 10;
+    endj = arrIndex[k] % 10;
+    arr[endi][endj] = 0;
+
+    bfs();
+    if (!len)
     {
-      scanf("%d", &a);
-      vertices[a - 1] = 1;
-    }
-    vertices[s] = 2;
-    for (i = 1; i < n; ++i)
-    {
-      scanf("%d %d", &a, &b);
-      a = a - 1;
-      b = b - 1;
-      graph[a].push_back(b);
-      graph[b].push_back(a);
-    }
-    if (s == t)
-    {
-      printf("Case %d: 0\n\n", k);
+      printf("IMPOSSIBLE");
       continue;
     }
-    Node no = bfs();
-    if (!foundFlag)
+    printf("%d\n", len);
+    for (i = 0; i < len; ++i)
     {
-      printf("Case %d: -1\n\n", k);
-      continue;
+      if (i != 0)
+        putchar(' ');
+      printf("%d %d", indexResL[i][0] + 1, indexResL[i][1] + 1);
     }
-    setPaths(no);
-    printf("Case %d: %d\n", k, no.num);
-    for (i = 0; i < no.num; ++i)
-      printf("%d %d\n", paths[i] % 20 + 1, paths[i] / 20 + 1);
     putchar('\n');
   }
-
-  return 0;
 }
