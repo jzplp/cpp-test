@@ -10,6 +10,15 @@ unsigned long long resList[10000];
 int resLenList[10000];
 int resLen;
 
+// 结点 计算值使用
+struct Node {
+  bool isNumber;
+  int value;
+};
+
+int NodeList[20];
+int nodeListLen = 0;
+
 bool isNumber(char c) {
   if(c >= '0' && c<= '9') return true;
   return false;
@@ -52,6 +61,16 @@ bool hasSign() {
   }
   return n ? true : false;
 }
+
+// 将分离数字字符串转换成真正的数字，与符号一起放到NodeList中
+void setNodeList() {
+  nodeListLen = 0;
+  int i = 0,j ,k;
+  while(i < len2) {
+
+  }
+}
+
 
 void judge()
 {
