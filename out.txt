@@ -1,2 +1,8 @@
-10
-12 5 3 8 15 12 6 13 7 9 1 7 10 8 7 9 11 14 14 5
+Problem 1
+  2100-100=
+  2*100*10+0=
+  2*100*10-0=
+Problem 2
+  IMPOSSIBLE
+Problem 3
+  IMPOSSIBLE
