@@ -97,7 +97,7 @@ void copyArr2()
 // 判断是否符合前导0条件
 bool judgeZero()
 {
-  int i, j, k; 
+  int i, j, k;
   // 首位0
   if (arr2[0] == '0')
   {
@@ -179,7 +179,6 @@ bool count()
 
   // 计算加减法
   value = NodeListT[0].value;
-  // printf("w %d ww\n", nodeListLenT);
   i = 1;
   while (i < nodeListLenT)
   {
@@ -189,7 +188,6 @@ bool count()
       value -= NodeListT[i + 1].value;
     i += 2;
   }
-  // printf("w %d w\n", value);
   return value == 2000;
 }
 
@@ -214,24 +212,24 @@ void judge()
 
 void dfs(int n)
 {
-  if ((n + 1) * 2 > len1) {
-    // printf("a %d a\n", n);
+  if ((n + 1) * 2 > len1)
+  {
     judge();
     return;
   }
+  arr1[n * 2 + 1] = '*';
   dfs(n + 1);
   arr1[n * 2 + 1] = '+';
   dfs(n + 1);
   arr1[n * 2 + 1] = '-';
   dfs(n + 1);
-  arr1[n * 2 + 1] = '*';
-  dfs(n + 1);
   arr1[n * 2 + 1] = 0;
+  dfs(n + 1);
 }
 
 int main()
 {
-  int t = 0, i, j, k;
+  int t = 0, i, j;
   char c;
   while (1)
   {
@@ -258,12 +256,16 @@ int main()
       printf("  IMPOSSIBLE\n");
       continue;
     }
-    for (i = 0; i < resLen; ++i)
-    {
-      ull2arr(resList[i], resLenList[i]);
-      printf("  ");
-      output(2);
-    }
+    // for (j = 0; j < 20; ++j)
+    // {
+      for (i = 0; i < resLen; ++i)
+      {
+        // if(resLenList[i] != j) continue;
+        ull2arr(resList[i], resLenList[i]);
+        printf("  ");
+        output(2);
+      }
+    // }
   }
 
   return 0;
