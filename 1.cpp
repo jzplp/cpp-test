@@ -5,9 +5,6 @@ char arr1[20];
 int len1;
 char arr2[20];
 int len2;
-
-unsigned long long resList[10000];
-int resLenList[10000];
 int resLen;
 
 void output(int flag)
@@ -27,47 +24,6 @@ bool isNumber(char c)
   if (c >= '0' && c <= '9')
     return true;
   return false;
-}
-
-unsigned long long arr2ull()
-{
-  int i, j, k;
-  unsigned long long value = 0;
-  for (i = 0; i < len2; ++i)
-  {
-    if (isNumber(arr2[i]))
-      j = arr2[i] - '0';
-    else
-    {
-      if (arr2[i] == '*')
-        j = 10;
-      if (arr2[i] == '+')
-        j = 11;
-      if (arr2[i] == '-')
-        j = 12;
-    }
-    value = value * 16 + j;
-  }
-  return value;
-}
-
-void ull2arr(unsigned long long ull, int len)
-{
-  int i, j, k;
-  for (i = len - 1; i >= 0; --i)
-  {
-    j = ull % 16;
-    ull /= 16;
-    if (j < 10)
-      arr2[i] = j + '0';
-    if (j == 10)
-      arr2[i] = '*';
-    if (j == 11)
-      arr2[i] = '+';
-    if (j == 12)
-      arr2[i] = '-';
-  }
-  len2 = len;
 }
 
 // 结点 计算值使用
@@ -204,9 +160,9 @@ void judge()
   // 判断等式是否等于2000
   if (!count())
     return;
-  // 加到结果中
-  resList[resLen] = arr2ull();
-  resLenList[resLen] = len2;
+  // 输出结果
+  printf("  ");
+  output(2);
   resLen++;
 }
 
@@ -235,8 +191,10 @@ int main()
   {
     ++t;
     memset(arr1, 0, sizeof(arr1));
+    memset(arr2, 0, sizeof(arr2));
     len1 = 0;
     resLen = 0;
+    len2 = 0;
     for (i = 0;; i = i + 2)
     {
       c = getchar();
@@ -249,23 +207,13 @@ int main()
     len1 = i - 1;
     while (getchar() != '\n')
       ;
-    dfs(0);
     printf("Problem %d\n", t);
+    dfs(0);
     if (resLen == 0)
     {
       printf("  IMPOSSIBLE\n");
       continue;
     }
-    // for (j = 0; j < 20; ++j)
-    // {
-      for (i = 0; i < resLen; ++i)
-      {
-        // if(resLenList[i] != j) continue;
-        ull2arr(resList[i], resLenList[i]);
-        printf("  ");
-        output(2);
-      }
-    // }
   }
 
   return 0;
