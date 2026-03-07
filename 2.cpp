@@ -1,9 +1,17 @@
 #include <stdio.h>
+#include <stdlib.h>
 
 int n;
 int arr[10000];
 int max, sum;
 int num;
+
+void output() {
+  for(int i = 0; i < n; ++i) {
+    printf("%d ", arr[i]);
+  }
+  putchar('\n');
+}
 
 bool judge(int t)
 {
@@ -50,6 +58,10 @@ int compute()
   return sum;
 }
 
+int compare(const void * a, const void * b) {
+  return *(int *)b - *(int *)a;
+}
+
 int main()
 {
   int i;
@@ -64,6 +76,7 @@ int main()
       if (arr[i] > max)
         max = arr[i];
     }
+    qsort(arr, n, sizeof(int), compare);
     printf("%d\n", compute());
   }
   return 0;
