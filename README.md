@@ -10,6 +10,7 @@ g++ 1.cpp
 Get-Content 1.txt | ./a.exe
 # 执行 输入重定向到1.txt 输出重定向到 out.txt
 Get-Content 1.txt | ./a.exe | Out-File out.txt
+Get-Content 2.txt | ./a.exe | Out-File out2.txt
 ```
 
 ## MacOS环境信息

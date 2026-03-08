@@ -2,43 +2,55 @@
 #include <stdlib.h>
 
 int n;
-int arr[10000];
+int arr[1000];
+int arr2[1000];
 int max, sum;
 int num;
 
-void output() {
-  for(int i = 0; i < n; ++i) {
+void copy()
+{
+  for (int i = 0; i < n; ++i)
+    arr2[i] = arr[i];
+}
+
+void output()
+{
+  for (int i = 0; i < n; ++i)
+  {
     printf("%d ", arr[i]);
   }
   putchar('\n');
 }
 
-bool judge(int t)
+bool judge(int t, int j)
 {
   if (t == n)
+    return false;
+  if (arr2[t] == 0 || arr2[t] == num)
     return true;
-  if (arr[t] == 0 || arr[t] == num)
-    return judge(t + 1);
   int a1, a2;
   int i;
-  for (i = t + 1; i < n; ++i)
+  for (i = j; i < n; ++i)
   {
-    if (arr[i] == 0 || arr[i] + arr[t] > num)
+    if (arr2[i] == 0 || arr2[i] + arr2[t] > num)
       continue;
-    a1 = arr[t];
-    a2 = arr[i];
-    if (arr[i] + arr[t] == num)
+    if (arr2[i] + arr2[t] == num)
     {
-      arr[i] = 0;
-      arr[t] = 0;
-      if(judge(t + 1)) return true;
-    } else if(arr[i] + arr[t] < num) {
-      arr[i] += arr[t];
-      arr[t] = 0;
-      if(judge(t + 1)) return true;
+      arr2[i] = 0;
+      arr2[t] = 0;
+      return true;
     }
-    arr[t] = a1;
-    arr[i] = a2;
+    a1 = arr2[t];
+    a2 = arr2[i];
+    if (arr2[i] + arr2[t] < num)
+    {
+      arr2[t] += arr2[i];
+      arr2[i] = 0;
+      if (judge(t, i + 1))
+        return true;
+    }
+    arr2[t] = a1;
+    arr2[i] = a2;
   }
   return false;
 }
@@ -52,13 +64,19 @@ int compute()
     if (sum % i)
       continue;
     num = i;
-    if (judge(0))
-      return i;
+    copy();
+    for (j = 0; j < n; ++j)
+    {
+      if (!judge(j, j + 1))
+        continue;
+    }
+    return i;
   }
   return sum;
 }
 
-int compare(const void * a, const void * b) {
+int compare(const void *a, const void *b)
+{
   return *(int *)b - *(int *)a;
 }
 

@@ -29,6 +29,7 @@ bool judge(int t)
       arr[i] = 0;
       arr[t] = 0;
       if(judge(t + 1)) return true;
+      else return false;
     } else if(arr[i] + arr[t] < num) {
       arr[i] += arr[t];
       arr[t] = 0;
