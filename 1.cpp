@@ -27,7 +27,11 @@ bool judge(int t, int j)
   if (t == n)
     return false;
   if (arr2[t] == 0 || arr2[t] == num)
+  {
+    arr2[t] = 0;
     return true;
+  }
+
   int a1, a2;
   int i;
   for (i = j; i < n; ++i)
@@ -40,17 +44,17 @@ bool judge(int t, int j)
       arr2[t] = 0;
       return true;
     }
-    a1 = arr2[t];
-    a2 = arr2[i];
     if (arr2[i] + arr2[t] < num)
     {
+      a1 = arr2[t];
+      a2 = arr2[i];
       arr2[t] += arr2[i];
       arr2[i] = 0;
       if (judge(t, i + 1))
         return true;
+      arr2[t] = a1;
+      arr2[i] = a2;
     }
-    arr2[t] = a1;
-    arr2[i] = a2;
   }
   return false;
 }
@@ -68,9 +72,10 @@ int compute()
     for (j = 0; j < n; ++j)
     {
       if (!judge(j, j + 1))
-        continue;
+        break;
     }
-    return i;
+    if (j == n)
+      return num;
   }
   return sum;
 }
