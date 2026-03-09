@@ -25,11 +25,11 @@ void output()
 bool judge(int t, int j)
 {
   if (t == n)
-    return true;
+    return false;
   if (arr2[t] == 0 || arr2[t] == num)
   {
     arr2[t] = 0;
-    return judge(t + 1, t + 2);
+    return true;
   }
 
   int a1, a2;
@@ -38,24 +38,23 @@ bool judge(int t, int j)
   {
     if (arr2[i] == 0 || arr2[i] + arr2[t] > num)
       continue;
-    a1 = arr2[t];
-    a2 = arr2[i];
     if (arr2[i] + arr2[t] == num)
     {
       arr2[i] = 0;
       arr2[t] = 0;
-      if (judge(t + 1, t + 2))
-        return true;
+      return true;
     }
-    else if (arr2[i] + arr2[t] < num)
+    if (arr2[i] + arr2[t] < num)
     {
+      a1 = arr2[t];
+      a2 = arr2[i];
       arr2[t] += arr2[i];
       arr2[i] = 0;
       if (judge(t, i + 1))
         return true;
+      arr2[t] = a1;
+      arr2[i] = a2;
     }
-    arr2[t] = a1;
-    arr2[i] = a2;
   }
   return false;
 }
@@ -70,9 +69,13 @@ int compute()
       continue;
     num = i;
     copy();
-    if (!judge(0, 1))
-      continue;
-    return num;
+    for (j = 0; j < n; ++j)
+    {
+      if (!judge(j, j + 1))
+        break;
+    }
+    if (j == n)
+      return num;
   }
   return sum;
 }
