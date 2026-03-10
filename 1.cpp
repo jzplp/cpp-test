@@ -11,10 +11,7 @@ bool judge(int t, int j)
   if (t == n)
     return true;
   if (arr[t] == 0 || arr[t] == num)
-  {
-    arr[t] = 0;
     return judge(t + 1, t + 2);
-  }
   int a1 = arr[t], a2 = 0;
   int i;
   for (i = j; i < n; ++i)
