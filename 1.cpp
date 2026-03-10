@@ -2,74 +2,55 @@
 #include <stdlib.h>
 
 int n;
-int arr[1000];
-int arr2[1000];
+int arr[100];
 int max, sum;
 int num;
-
-void copy()
-{
-  for (int i = 0; i < n; ++i)
-    arr2[i] = arr[i];
-}
-
-void output()
-{
-  for (int i = 0; i < n; ++i)
-  {
-    printf("%d ", arr[i]);
-  }
-  putchar('\n');
-}
 
 bool judge(int t, int j)
 {
   if (t == n)
     return true;
-  if (arr2[t] == 0 || arr2[t] == num)
+  if (arr[t] == 0 || arr[t] == num)
   {
-    arr2[t] = 0;
+    arr[t] = 0;
     return judge(t + 1, t + 2);
   }
-
-  int a1, a2;
+  int a1 = arr[t], a2 = 0;
   int i;
   for (i = j; i < n; ++i)
   {
-    if (arr2[i] == 0 || arr2[i] + arr2[t] > num)
+    if (arr[i] == 0 || arr[i] + arr[t] > num)
       continue;
-    a1 = arr2[t];
-    a2 = arr2[i];
-    if (arr2[i] + arr2[t] == num)
+    if (arr[i] == a2)
+      continue;
+    a2 = arr[i];
+    if (arr[i] + arr[t] == num)
     {
-      arr2[i] = 0;
-      arr2[t] = 0;
+      arr[i] = 0;
       if (judge(t + 1, t + 2))
         return true;
     }
-    else if (arr2[i] + arr2[t] < num)
+    else if (arr[i] + arr[t] < num)
     {
-      arr2[t] += arr2[i];
-      arr2[i] = 0;
+      arr[t] += arr[i];
+      arr[i] = 0;
       if (judge(t, i + 1))
         return true;
+      arr[t] = a1;
     }
-    arr2[t] = a1;
-    arr2[i] = a2;
+    arr[i] = a2;
   }
   return false;
 }
 
 int compute()
 {
-  int i, j, k;
-  for (i = max; i < sum / 2 + 1; ++i)
+  for (int i = max; i < sum / 2 + 1; ++i)
   {
     // 筛选出能整除的i
     if (sum % i)
       continue;
     num = i;
-    copy();
     if (!judge(0, 1))
       continue;
     return num;
