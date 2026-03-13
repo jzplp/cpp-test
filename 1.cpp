@@ -3,6 +3,7 @@
 
 int r, c;
 int arr[32][32];
+int numCount;
 int findArr[32][32];
 int maxNum[35];
 int maxLen;
@@ -52,9 +53,7 @@ void dfs(int x, int y, int len)
   }
   findArr[x][y] = 0;
   if (!hasNext && len >= maxLen)
-  {
     compareMax(len);
-  }
 }
 
 void computed()
@@ -66,7 +65,8 @@ void computed()
     {
       if (arr[i][j] == 0)
         continue;
-      maxLen = 0;
+      if (numCount == maxLen && arr[i][j] < maxNum[0])
+        continue;
       dfs(i, j, 0);
     }
   }
@@ -79,6 +79,8 @@ int main()
   while (scanf("%d %d", &r, &c) >= 2 && r != 0 && c != 0)
   {
     memset(arr, 0, sizeof(arr));
+    maxLen = 0;
+    numCount = 0;
     getchar();
     for (i = 0; i < r; ++i)
     {
@@ -88,7 +90,10 @@ int main()
         if (ch == '#')
           arr[i][j] = 0;
         else
+        {
           arr[i][j] = ch - '0';
+          ++numCount;
+        }
       }
       getchar();
     }
