@@ -1,81 +1,101 @@
 #include <stdio.h>
-#include <stdlib.h>
+#include <string.h>
 
-int n;
-int arr[100];
-int max, sum;
-int num;
+int r, c;
+int arr[32][32];
+int findArr[32][32];
+int maxNum[35];
+int maxLen;
+int tempNum[35];
 
-bool judge(int t, int j)
+int Steps[4][2] = {{0, 1}, {0, -1}, {1, 0}, {-1, 0}};
+
+void compareMax(int len)
 {
-  if (t == n)
-    return true;
-  if (arr[t] == 0 || arr[t] == num)
-    return judge(t + 1, t + 2);
-  int a1 = arr[t], a2 = 0;
-  int i;
-  for (i = j; i < n; ++i)
+  int i, j;
+  if (len > maxLen)
   {
-    if (arr[i] == 0 || arr[i] + arr[t] > num)
-      continue;
-    if (arr[i] == a2)
-      continue;
-    a2 = arr[i];
-    if (arr[i] + arr[t] == num)
-    {
-      arr[i] = 0;
-      if (judge(t + 1, t + 2))
-        return true;
-    }
-    else if (arr[i] + arr[t] < num)
-    {
-      arr[t] += arr[i];
-      arr[i] = 0;
-      if (judge(t, i + 1))
-        return true;
-      arr[t] = a1;
-    }
-    arr[i] = a2;
+    for (i = 0; i < len; ++i)
+      maxNum[i] = tempNum[i];
+    maxLen = len;
+    return;
   }
-  return false;
+  for (i = 0; i < len; ++i)
+  {
+    if (maxNum[i] > tempNum[i])
+      return;
+    if (maxNum[i] < tempNum[i])
+      break;
+  }
+  if (i == len)
+    return;
+  for (i = 0; i < len; ++i)
+    maxNum[i] = tempNum[i];
 }
 
-int compute()
+void dfs(int x, int y, int len)
 {
-  for (int i = max; i < sum / 2 + 1; ++i)
+  tempNum[len] = arr[x][y];
+  findArr[x][y] = 1;
+  ++len;
+  int i, j, x1, y1, hasNext = 0;
+  for (i = 0; i < 4; ++i)
   {
-    // 筛选出能整除的i
-    if (sum % i)
+    x1 = x + Steps[i][0];
+    y1 = y + Steps[i][1];
+    if (x1 < 0 || x1 >= r || y1 < 0 || y1 >= c)
       continue;
-    num = i;
-    if (!judge(0, 1))
+    if (arr[x1][y1] == 0 || findArr[x1][y1])
       continue;
-    return num;
+    hasNext = 1;
+    dfs(x1, y1, len);
   }
-  return sum;
+  findArr[x][y] = 0;
+  if (!hasNext && len >= maxLen)
+  {
+    compareMax(len);
+  }
 }
 
-int compare(const void *a, const void *b)
+void computed()
 {
-  return *(int *)b - *(int *)a;
+  int i, j;
+  for (i = 0; i < r; ++i)
+  {
+    for (j = 0; j < c; ++j)
+    {
+      if (arr[i][j] == 0)
+        continue;
+      maxLen = 0;
+      dfs(i, j, 0);
+    }
+  }
 }
 
 int main()
 {
-  int i;
-  while (scanf("%d", &n) == 1 && n != 0)
+  int i, j, k;
+  char ch;
+  while (scanf("%d %d", &r, &c) >= 2 && r != 0 && c != 0)
   {
-    max = 0;
-    sum = 0;
-    for (i = 0; i < n; ++i)
+    memset(arr, 0, sizeof(arr));
+    getchar();
+    for (i = 0; i < r; ++i)
     {
-      scanf("%d", &arr[i]);
-      sum += arr[i];
-      if (arr[i] > max)
-        max = arr[i];
+      for (j = 0; j < c; ++j)
+      {
+        ch = getchar();
+        if (ch == '#')
+          arr[i][j] = 0;
+        else
+          arr[i][j] = ch - '0';
+      }
+      getchar();
     }
-    qsort(arr, n, sizeof(int), compare);
-    printf("%d\n", compute());
+    computed();
+    for (i = 0; i < maxLen; ++i)
+      printf("%d", maxNum[i]);
+    putchar('\n');
   }
   return 0;
 }
