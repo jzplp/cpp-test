@@ -1,106 +1,75 @@
 #include <stdio.h>
 #include <string.h>
 
-int r, c;
-int arr[32][32];
-int numCount;
-int findArr[32][32];
-int maxNum[35];
-int maxLen;
-int tempNum[35];
+int arr[35][35];
+int n, k;
+// 下标从1开始
+int groups[30];
+int groupsFind[30];
 
-int Steps[4][2] = {{0, 1}, {0, -1}, {1, 0}, {-1, 0}};
+bool judge() {}
 
-void compareMax(int len)
-{
-  int i, j;
-  if (len > maxLen)
-  {
-    for (i = 0; i < len; ++i)
-      maxNum[i] = tempNum[i];
-    maxLen = len;
-    return;
-  }
-  for (i = 0; i < len; ++i)
-  {
-    if (maxNum[i] > tempNum[i])
-      return;
-    if (maxNum[i] < tempNum[i])
-      break;
-  }
-  if (i == len)
-    return;
-  for (i = 0; i < len; ++i)
-    maxNum[i] = tempNum[i];
+bool computeRect(int x, int y, int r) {
+  int a, b, c, d;
+  int groupIndex = arr[x][y];
+  int c = groups[groupIndex] / a;
+
+  int xmin = x / a;
+
+  for(a = 0)
 }
 
-void dfs(int x, int y, int len)
-{
-  tempNum[len] = arr[x][y];
-  findArr[x][y] = 1;
-  ++len;
-  int i, j, x1, y1, hasNext = 0;
-  for (i = 0; i < 4; ++i)
-  {
-    x1 = x + Steps[i][0];
-    y1 = y + Steps[i][1];
-    if (x1 < 0 || x1 >= r || y1 < 0 || y1 >= c)
-      continue;
-    if (arr[x1][y1] == 0 || findArr[x1][y1])
-      continue;
-    hasNext = 1;
-    dfs(x1, y1, len);
+
+bool computed(int x, int y) {
+  if(y == n) {
+    return computed(x + 1, y);
   }
-  findArr[x][y] = 0;
-  if (!hasNext && len >= maxLen)
-    compareMax(len);
+  if (x == n) {
+    return judge();
+  }
+  if(arr[x][y] == 0) {
+    return computed(x, y + 1);
+  }
+  int groupIndex = arr[x][y];
+  if(groupsFind[groupIndex]) {
+    return computed(x, y + 1);
+  }
+  int a, b,c, d;
+  for(a = 1; a <= groups[groupIndex]; ++a) {
+    if(groups[groupIndex] % a) continue;
+
+  }
+
+
 }
 
-void computed()
-{
-  int i, j;
-  for (i = 0; i < r; ++i)
-  {
-    for (j = 0; j < c; ++j)
-    {
-      if (arr[i][j] == 0)
-        continue;
-      if (numCount == maxLen && arr[i][j] < maxNum[0])
-        continue;
-      dfs(i, j, 0);
-    }
-  }
-}
 
 int main()
 {
-  int i, j, k;
-  char ch;
-  while (scanf("%d %d", &r, &c) >= 2 && r != 0 && c != 0)
+  int i, j, kt;
+  char c;
+  while (scanf("%d %d", &n, &k) == 2 && n > 0 & k > 0)
   {
-    memset(arr, 0, sizeof(arr));
-    maxLen = 0;
-    numCount = 0;
-    getchar();
-    for (i = 0; i < r; ++i)
+    memset(groupsFind, 0, sizeof(groupsFind));
+    kt = 1;
+    for (i = 0; i < n; ++i)
     {
-      for (j = 0; j < c; ++j)
+      getchar();
+      for (j = 0; j < n; ++j)
       {
-        ch = getchar();
-        if (ch == '#')
+        c = getchar();
+        if (c == '.')
           arr[i][j] = 0;
         else
         {
-          arr[i][j] = ch - '0';
-          ++numCount;
+          groups[kt] = c - '0';
+          arr[i][j] = kt;
+          ++kt;
         }
       }
-      getchar();
     }
-    computed();
-    for (i = 0; i < maxLen; ++i)
-      printf("%d", maxNum[i]);
-    putchar('\n');
+    computed(0, 0);
   }
+
   return 0;
 }
