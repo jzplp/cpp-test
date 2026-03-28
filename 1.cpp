@@ -9,13 +9,28 @@ int groupsFind[30];
 
 bool computed(int x, int y);
 
-void outArr()
+void outArr1()
 {
   int i, j;
   for (i = 0; i < n; ++i)
   {
     for (j = 0; j < n; ++j)
-      printf("%d", arr[i][j]);
+    {
+      if (!arr[i][j])
+        printf("  0");
+      else
+        printf("%3d", groups[arr[i][j]]);
+    }
+    putchar('\n');
+  }
+}
+void outArr2()
+{
+  int i, j;
+  for (i = 0; i < n; ++i)
+  {
+    for (j = 0; j < n; ++j)
+      printf("%3d", arr[i][j]);
     putchar('\n');
   }
 }
@@ -109,6 +124,7 @@ bool computed(int x, int y)
     if (computeRect(x, y, a))
       return true;
   }
+  groupsFind[groupIndex] = 0;
   return false;
 }
 
@@ -122,10 +138,8 @@ void output()
     for (j = 0; j < n; ++j)
     {
       if (!groupMap[arr[i][j]])
-      {
         groupMap[arr[i][j]] = ++gi;
 
-      }
       printf("%c", groupMap[arr[i][j]] + 'A' - 1);
     }
     putchar('\n');
@@ -156,7 +170,8 @@ int main()
         }
       }
     }
-    // outArr();
+    // outArr2();
+    // outArr1();
     if (!computed(0, 0))
     {
       printf("xxx\n");
