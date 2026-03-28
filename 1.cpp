@@ -7,42 +7,126 @@ int n, k;
 int groups[30];
 int groupsFind[30];
 
-bool judge() {}
+bool computed(int x, int y);
 
-bool computeRect(int x, int y, int r) {
-  int a, b, c, d;
-  int groupIndex = arr[x][y];
-  int c = groups[groupIndex] / a;
-
-  int xmin = x / a;
-
-  for(a = 0)
+void outArr()
+{
+  int i, j;
+  for (i = 0; i < n; ++i)
+  {
+    for (j = 0; j < n; ++j)
+      printf("%d", arr[i][j]);
+    putchar('\n');
+  }
 }
 
+bool judge()
+{
+  return true;
+}
 
-bool computed(int x, int y) {
-  if(y == n) {
+// 判断单个矩形是否符合要求
+bool judgeRect(int x, int y, int xmin, int ymin, int xmax, int ymax)
+{
+  int i, j;
+  for (i = xmin; i <= xmax; ++i)
+  {
+    for (j = ymin; j <= ymax; ++j)
+    {
+      if (i == x && j == y)
+        continue;
+      if (arr[i][j])
+        return false;
+    }
+  }
+  return true;
+}
+
+// 对矩形设置值
+void setRect(int xmin, int ymin, int xmax, int ymax, int v)
+{
+  int i, j;
+  for (i = xmin; i <= xmax; ++i)
+    for (j = ymin; j <= ymax; ++j)
+      arr[i][j] = v;
+}
+
+// 对与队长坐标（x,y）x方向长度为r的进行计算
+bool computeRect(int x, int y, int r)
+{
+  int i, j;
+  int groupIndex = arr[x][y];
+  int c = groups[groupIndex] / r;
+  int xmin, xmax, ymin, ymax;
+  for (i = 0; i < r; ++i)
+  {
+    xmax = x + i;
+    xmin = xmax - r + 1;
+    if (xmax >= n)
+      break;
+    if (xmin < 0)
+      continue;
+    for (j = 0; j < c; ++j)
+    {
+      ymax = y + j;
+      ymin = ymax - c + 1;
+      if (ymax >= n)
+        break;
+      if (ymin < 0)
+        continue;
+      if (!judgeRect(x, y, xmin, ymin, xmax, ymax))
+        continue;
+      setRect(xmin, ymin, xmax, ymax, groupIndex);
+      if (computed(x, y + 1))
+        return true;
+      setRect(xmin, ymin, xmax, ymax, 0);
+      arr[x][y] = groupIndex;
+    }
+  }
+  return false;
+}
+
+bool computed(int x, int y)
+{
+  if (y == n)
     return computed(x + 1, y);
-  }
-  if (x == n) {
+  if (x == n)
     return judge();
-  }
-  if(arr[x][y] == 0) {
+  if (arr[x][y] == 0)
     return computed(x, y + 1);
-  }
   int groupIndex = arr[x][y];
-  if(groupsFind[groupIndex]) {
+  if (groupsFind[groupIndex])
     return computed(x, y + 1);
+  int a, b, c, d;
+  for (a = 1; a <= groups[groupIndex]; ++a)
+  {
+    if (groups[groupIndex] % a)
+      continue;
+    if (computeRect(x, y, a))
+      return true;
   }
-  int a, b,c, d;
-  for(a = 1; a <= groups[groupIndex]; ++a) {
-    if(groups[groupIndex] % a) continue;
-
-  }
-
-
+  return false;
 }
 
+void output()
+{
+  int i, j;
+  int groupMap[30] = {};
+  int gi = 0;
+  for (i = 0; i < n; ++i)
+  {
+    for (j = 0; j < n; ++j)
+    {
+      if (!groupMap[arr[i][j]])
+      {
+        groupMap[arr[i][j]] = gi;
+        ++gi;
+      }
+      printf("%c", groupMap[arr[i][j]] + 'A');
+    }
+    putchar('\n');
+  }
+}
 
 int main()
 {
@@ -68,8 +152,13 @@ int main()
         }
       }
     }
-    computed(0, 0);
+    outArr();
+    if (!computed(0, 0))
+    {
+      printf("xxx\n");
+      continue;
+    }
+    output();
   }
-
   return 0;
 }
