@@ -3,11 +3,18 @@
 
 int arr[35][35];
 int n, k;
-// 下标从1开始
-int groups[30];
-int groupsFind[30];
 
-bool computed(int x, int y);
+struct Group
+{
+  int x, y;
+  int num;
+};
+
+// 下标从1开始
+Group groups[30] = {};
+int glen;
+
+bool computed(int index);
 
 void outArr1()
 {
@@ -19,7 +26,7 @@ void outArr1()
       if (!arr[i][j])
         printf("  0");
       else
-        printf("%3d", groups[arr[i][j]]);
+        printf("%3d", groups[arr[i][j]].num);
     }
     putchar('\n');
   }
@@ -33,11 +40,6 @@ void outArr2()
       printf("%3d", arr[i][j]);
     putchar('\n');
   }
-}
-
-bool judge()
-{
-  return true;
 }
 
 // 判断单个矩形是否符合要求
@@ -67,12 +69,11 @@ void setRect(int xmin, int ymin, int xmax, int ymax, int v)
 }
 
 // 对与队长坐标（x,y）x方向长度为r的进行计算
-bool computeRect(int x, int y, int r)
+bool computeRect(int index, int r)
 {
-  // printf("-- %d %d %d\n", x, y, r);
+  int x = groups[index].x, y = groups[index].y, num = groups[index].num;
   int i, j;
-  int groupIndex = arr[x][y];
-  int c = groups[groupIndex] / r;
+  int c = num / r;
   int xmin, xmax, ymin, ymax;
   for (i = 0; i < r; ++i)
   {
@@ -93,38 +94,28 @@ bool computeRect(int x, int y, int r)
       if (!judgeRect(x, y, xmin, ymin, xmax, ymax))
         continue;
       // printf("%d %d %d %d\n", xmin, xmax, ymin, ymax);
-      setRect(xmin, ymin, xmax, ymax, groupIndex);
-      if (computed(x, y + 1))
+      setRect(xmin, ymin, xmax, ymax, index);
+      if (computed(index + 1))
         return true;
       setRect(xmin, ymin, xmax, ymax, 0);
-      arr[x][y] = groupIndex;
+      arr[x][y] = index;
     }
   }
   return false;
 }
 
-bool computed(int x, int y)
+bool computed(int index)
 {
-  // outArr();
-  if (y == n)
-    return computed(x + 1, 0);
-  if (x == n)
-    return true;
-  if (arr[x][y] == 0)
-    return computed(x, y + 1);
-  int groupIndex = arr[x][y];
-  if (groupsFind[groupIndex])
-    return computed(x, y + 1);
+  if(index >= glen) return true;
+  int x = groups[index].x, y = groups[index].y, num = groups[index].num;
   int a, b, c, d;
-  groupsFind[groupIndex] = 1;
-  for (a = 1; a <= groups[groupIndex]; ++a)
+  for (a = 1; a <= num; ++a)
   {
-    if (groups[groupIndex] % a)
+    if (num % a)
       continue;
-    if (computeRect(x, y, a))
+    if (computeRect(index, a))
       return true;
   }
-  groupsFind[groupIndex] = 0;
   return false;
 }
 
@@ -152,7 +143,9 @@ int main()
   char c;
   while (scanf("%d %d", &n, &k) == 2 && n > 0 & k > 0)
   {
-    memset(groupsFind, 0, sizeof(groupsFind));
+    memset(groups, 0, sizeof(groups));
+    memset(arr, 0, sizeof(arr));
+    glen = 0;
     kt = 1;
     for (i = 0; i < n; ++i)
     {
@@ -160,24 +153,20 @@ int main()
       for (j = 0; j < n; ++j)
       {
         c = getchar();
-        if (c == '.')
-          arr[i][j] = 0;
-        else
+        if (c != '.')
         {
-          groups[kt] = c - '0';
+          groups[kt] = {i, j, c - '0'};
           arr[i][j] = kt;
           ++kt;
         }
       }
     }
-    // outArr2();
-    // outArr1();
-    if (!computed(0, 0))
+    glen = kt;
+    if (!computed(1))
     {
       printf("xxx\n");
       continue;
     }
-    // outArr();
     output();
   }
   return 0;
