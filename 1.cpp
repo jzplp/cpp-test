@@ -75,22 +75,26 @@ bool computeRect(int index, int r)
   int i, j;
   int c = num / r;
   int xmin, xmax, ymin, ymax;
-  for (i = 0; i < r; ++i)
+  if (x - r + 1 < 0)
+    i = -(x - r + 1);
+  else
+    i = 0;
+  for (; i < r; ++i)
   {
     xmax = x + i;
     xmin = xmax - r + 1;
     if (xmax >= n)
       break;
-    if (xmin < 0)
-      continue;
-    for (j = 0; j < c; ++j)
+    if (y - c + 1 < 0)
+      j = -(y - c + 1);
+    else
+      j = 0;
+    for (; j < c; ++j)
     {
       ymax = y + j;
       ymin = ymax - c + 1;
       if (ymax >= n)
         break;
-      if (ymin < 0)
-        continue;
       if (!judgeRect(x, y, xmin, ymin, xmax, ymax))
         continue;
       // printf("%d %d %d %d\n", xmin, xmax, ymin, ymax);
@@ -106,9 +110,10 @@ bool computeRect(int index, int r)
 
 bool computed(int index)
 {
-  if(index >= glen) return true;
+  if (index >= glen)
+    return true;
   int x = groups[index].x, y = groups[index].y, num = groups[index].num;
-  int a, b, c, d;
+  int a;
   for (a = 1; a <= num; ++a)
   {
     if (num % a)
