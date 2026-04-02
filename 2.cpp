@@ -1,45 +1,71 @@
 #include <stdio.h>
 #include <string.h>
-#include <math.h>
 
+int arr[35][35];
 int n, k;
-int arr[30][30];
 
 struct Group
 {
   int x, y;
   int num;
-  int xmin;
-  int ymin;
-  int xmax;
-  int ymax;
 };
 
-// 下标从0开始
+// 下标从1开始
 Group groups[30] = {};
 int glen;
 
 bool computed(int index);
 
-// 判断单个矩形是否符合要求
-bool judgeRect(int index)
+void outArr1()
 {
   int i, j;
-  int leftx, rightx, lefty, righty;
-  int xmin = groups[index].xmin;
-  int ymin = groups[index].ymin;
-  int xmax = groups[index].xmax;
-  int ymax = groups[index].ymax;
-  for (i = 1; i < index; ++i)
+  for (i = 0; i < n; ++i)
   {
-    leftx = abs(xmin + xmax - groups[i].xmin - groups[i].xmax);
-    rightx = xmax - xmin + groups[i].xmax - groups[i].xmin;
-    lefty = abs(ymin + ymax - groups[i].ymin - groups[i].ymax);
-    righty = ymax - ymin + groups[i].ymax - groups[i].ymin;
-    if (leftx <= rightx && lefty <= righty)
-      return false;
+    for (j = 0; j < n; ++j)
+    {
+      if (!arr[i][j])
+        printf("  0");
+      else
+        printf("%3d", groups[arr[i][j]].num);
+    }
+    putchar('\n');
+  }
+}
+void outArr2()
+{
+  int i, j;
+  for (i = 0; i < n; ++i)
+  {
+    for (j = 0; j < n; ++j)
+      printf("%3d", arr[i][j]);
+    putchar('\n');
+  }
+}
+
+// 判断单个矩形是否符合要求
+bool judgeRect(int x, int y, int xmin, int ymin, int xmax, int ymax)
+{
+  int i, j;
+  for (i = xmin; i <= xmax; ++i)
+  {
+    for (j = ymin; j <= ymax; ++j)
+    {
+      if (i == x && j == y)
+        continue;
+      if (arr[i][j])
+        return false;
+    }
   }
   return true;
+}
+
+// 对矩形设置值
+void setRect(int xmin, int ymin, int xmax, int ymax, int v)
+{
+  int i, j;
+  for (i = xmin; i <= xmax; ++i)
+    for (j = ymin; j <= ymax; ++j)
+      arr[i][j] = v;
 }
 
 // 对与队长坐标（x,y）x方向长度为r的进行计算
@@ -69,14 +95,14 @@ bool computeRect(int index, int r)
       ymin = ymax - c + 1;
       if (ymax >= n)
         break;
-      groups[index].xmin = xmin;
-      groups[index].ymin = ymin;
-      groups[index].xmax = xmax;
-      groups[index].ymax = ymax;
-      if (!judgeRect(index))
+      if (!judgeRect(x, y, xmin, ymin, xmax, ymax))
         continue;
+      // printf("%d %d %d %d\n", xmin, xmax, ymin, ymax);
+      setRect(xmin, ymin, xmax, ymax, index);
       if (computed(index + 1))
         return true;
+      setRect(xmin, ymin, xmax, ymax, 0);
+      arr[x][y] = index;
     }
   }
   return false;
@@ -84,9 +110,9 @@ bool computeRect(int index, int r)
 
 bool computed(int index)
 {
-  if (index >= k)
+  if (index >= glen)
     return true;
-  int num = groups[index].num;
+  int x = groups[index].x, y = groups[index].y, num = groups[index].num;
   int a;
   for (a = 1; a <= num; ++a)
   {
@@ -100,19 +126,7 @@ bool computed(int index)
 
 void output()
 {
-  int i, j, x, y;
-  // 先把每个队铺到数组中
-  for (i = 0; i < k; ++i)
-  {
-    for (x = groups[i].xmin; x <= groups[i].xmax; ++x)
-    {
-      for (y = groups[i].ymin; y <= groups[i].ymax; ++y)
-      {
-        arr[x][y] = i;
-      }
-    }
-  }
-  // 然后分配字母
+  int i, j;
   int groupMap[30] = {};
   int gi = 0;
   for (i = 0; i < n; ++i)
@@ -135,7 +149,9 @@ int main()
   while (scanf("%d %d", &n, &k) == 2 && n > 0 & k > 0)
   {
     memset(groups, 0, sizeof(groups));
-    kt = 0;
+    memset(arr, 0, sizeof(arr));
+    glen = 0;
+    kt = 1;
     for (i = 0; i < n; ++i)
     {
       getchar();
@@ -144,12 +160,14 @@ int main()
         c = getchar();
         if (c != '.')
         {
-          groups[kt] = {i, j, c - '0', 0, 0, 0, 0};
+          groups[kt] = {i, j, c - '0'};
+          arr[i][j] = kt;
           ++kt;
         }
       }
     }
-    if (!computed(0))
+    glen = kt;
+    if (!computed(1))
     {
       printf("xxx\n");
       continue;
