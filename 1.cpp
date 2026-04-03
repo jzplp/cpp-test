@@ -8,6 +8,7 @@ struct Group
 {
   int x, y;
   int num;
+  bool hasFind;
 };
 
 // 下标从1开始
@@ -43,15 +44,13 @@ void outArr2()
 }
 
 // 判断单个矩形是否符合要求
-bool judgeRect(int x, int y, int xmin, int ymin, int xmax, int ymax)
+bool judgeRect(int xmin, int ymin, int xmax, int ymax)
 {
   int i, j;
   for (i = xmin; i <= xmax; ++i)
   {
     for (j = ymin; j <= ymax; ++j)
     {
-      if (i == x && j == y)
-        continue;
       if (arr[i][j])
         return false;
     }
@@ -68,58 +67,52 @@ void setRect(int xmin, int ymin, int xmax, int ymax, int v)
       arr[i][j] = v;
 }
 
-// 对与队长坐标（x,y）x方向长度为r的进行计算
-bool computeRect(int index, int r)
+int judgeTeam(int xmin, int ymin, int xmax, int ymax)
 {
-  int x = groups[index].x, y = groups[index].y, num = groups[index].num;
   int i, j;
-  int c = num / r;
-  int xmin, xmax, ymin, ymax;
-  if (x - r + 1 < 0)
-    i = -(x - r + 1);
-  else
-    i = 0;
-  for (; i < r; ++i)
+  int index = -1;
+  for (i = 1; i < glen; ++i)
   {
-    xmax = x + i;
-    xmin = xmax - r + 1;
-    if (xmax >= n)
-      break;
-    if (y - c + 1 < 0)
-      j = -(y - c + 1);
-    else
-      j = 0;
-    for (; j < c; ++j)
+    if (groups[i].hasFind)
+      continue;
+    if (index != -1)
+      return -1;
+    if (groups[i].x >= xmin && groups[i].x <= xmax && groups[i].y >= ymin && groups[i].y <= ymax)
     {
-      ymax = y + j;
-      ymin = ymax - c + 1;
-      if (ymax >= n)
-        break;
-      if (!judgeRect(x, y, xmin, ymin, xmax, ymax))
-        continue;
-      // printf("%d %d %d %d\n", xmin, xmax, ymin, ymax);
-      setRect(xmin, ymin, xmax, ymax, index);
-      if (computed(index + 1))
-        return true;
-      setRect(xmin, ymin, xmax, ymax, 0);
-      arr[x][y] = index;
+      index = i;
     }
   }
-  return false;
+  if (i == -1)
+    return i;
+  if (groups[i].num != (xmax - xmin + 1) * (ymax - ymin + 1))
+    return -1;
+  return i;
 }
 
-bool computed(int index)
+bool computed(int x, int y)
 {
-  if (index >= glen)
+  if (x >= n)
     return true;
-  int x = groups[index].x, y = groups[index].y, num = groups[index].num;
-  int a;
-  for (a = 1; a <= num; ++a)
+  if (y >= n)
+    return computed(x + 1, 0);
+  int i, j;
+  int t;
+  for (i = x; i < n; ++i)
   {
-    if (num % a)
-      continue;
-    if (computeRect(index, a))
-      return true;
+    for (j = y; j < n; ++j)
+    {
+      if (!judgeRect(x, y, i, j))
+        continue;
+      t = judgeTeam(x, y, i, j);
+      if (t <= 0)
+        continue;
+      groups[t].hasFind = true;
+      setRect(x, y, i, j, t);
+      if (computed(x, y + 1))
+        return true;
+      setRect(x, y, i, j, 0);
+      groups[t].hasFind = false;
+    }
   }
   return false;
 }
@@ -160,14 +153,13 @@ int main()
         c = getchar();
         if (c != '.')
         {
-          groups[kt] = {i, j, c - '0'};
-          arr[i][j] = kt;
+          groups[kt] = {i, j, c - '0', false};
           ++kt;
         }
       }
     }
     glen = kt;
-    if (!computed(1))
+    if (!computed(0, 0))
     {
       printf("xxx\n");
       continue;
