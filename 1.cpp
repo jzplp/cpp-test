@@ -17,32 +17,6 @@ int glen;
 
 bool computed(int index);
 
-void outArr1()
-{
-  int i, j;
-  for (i = 0; i < n; ++i)
-  {
-    for (j = 0; j < n; ++j)
-    {
-      if (!arr[i][j])
-        printf("  0");
-      else
-        printf("%3d", groups[arr[i][j]].num);
-    }
-    putchar('\n');
-  }
-}
-void outArr2()
-{
-  int i, j;
-  for (i = 0; i < n; ++i)
-  {
-    for (j = 0; j < n; ++j)
-      printf("%3d", arr[i][j]);
-    putchar('\n');
-  }
-}
-
 // 判断单个矩形是否符合要求
 bool judgeRect(int xmin, int ymin, int xmax, int ymax)
 {
@@ -75,18 +49,18 @@ int judgeTeam(int xmin, int ymin, int xmax, int ymax)
   {
     if (groups[i].hasFind)
       continue;
-    if (index != -1)
-      return -1;
     if (groups[i].x >= xmin && groups[i].x <= xmax && groups[i].y >= ymin && groups[i].y <= ymax)
     {
+      if (index != -1)
+        return -1;
       index = i;
     }
   }
-  if (i == -1)
-    return i;
-  if (groups[i].num != (xmax - xmin + 1) * (ymax - ymin + 1))
+  if (index == -1)
+    return index;
+  if (groups[index].num != (xmax - xmin + 1) * (ymax - ymin + 1))
     return -1;
-  return i;
+  return index;
 }
 
 bool computed(int x, int y)
@@ -95,6 +69,8 @@ bool computed(int x, int y)
     return true;
   if (y >= n)
     return computed(x + 1, 0);
+  if (arr[x][y])
+    return computed(x, y + 1);
   int i, j;
   int t;
   for (i = x; i < n; ++i)
