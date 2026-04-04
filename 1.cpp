@@ -63,13 +63,13 @@ bool judgeSec(int x, int y)
   return true;
 }
 
-//交叉点坐标终点
+// 交叉点坐标终点
 int endx, endy;
 
 // 入参为交叉点坐标
 bool loop(int x, int y, bool init)
 {
-  if (init && x == endx && y == endy)
+  if (!init && x == endx && y == endy)
     return true;
   // 向左上
   if (x != 0 && y != 0 && !arrLineLoop[x - 1][y - 1] && arrLine[x - 1][y - 1] == -1)
@@ -136,7 +136,7 @@ bool computed(int x, int y)
 
 int main()
 {
-  int N, n, i, j;
+  int N, i, j;
   char c;
   scanf("%d", &N);
   while (N--)
