@@ -1,146 +1,170 @@
 #include <stdio.h>
 #include <string.h>
 
-int arr[35][35];
-int n, k;
+// 1 / -1 \ 0 空
+int arrLine[10][10];
+int arrLineLoop[10][10];
+int arrSec[10][10];
+int n;
 
-struct Group
+// 入参为交叉点坐标
+int getSecNum(int x, int y)
 {
-  int x, y;
+  int num = 0;
+  // 左上角
+  if (x != 0 && y != 0)
+    num += arrLine[x - 1][y - 1] == -1;
+  // 右上角
+  if (x != 0 && y != n)
+    num += arrLine[x - 1][y] == 1;
+  // 左下角
+  if (x != n && y != 0)
+    num += arrLine[x][y - 1] == 1;
+  // 右下角
+  if (x != n && y != n)
+    num += arrLine[x][y] == -1;
+  return num;
+}
+
+// 入参为方块坐标
+bool judgeSec(int x, int y)
+{
   int num;
-  bool hasFind;
-};
-
-// 下标从1开始
-Group groups[30] = {};
-int glen;
-
-bool computed(int index);
-
-// 判断单个矩形是否符合要求
-bool judgeRect(int xmin, int ymin, int xmax, int ymax)
-{
-  int i, j;
-  for (i = xmin; i <= xmax; ++i)
+  // 左上角
+  if (arrSec[x][y] != -1 && getSecNum(x, y) != arrSec[x][y])
+    return false;
+  // 右上角
+  num = getSecNum(x, y + 1);
+  if (arrSec[x][y + 1] != -1)
   {
-    for (j = ymin; j <= ymax; ++j)
-    {
-      if (arr[i][j])
-        return false;
-    }
+    if (y == n - 1 && num != arrSec[x][y + 1])
+      return false;
+    if (num > arrSec[x][y + 1])
+      return false;
+  }
+  // 左下角
+  num = getSecNum(x + 1, y);
+  if (arrSec[x + 1][y] != -1)
+  {
+    if (x == n - 1 && num != arrSec[x + 1][y])
+      return false;
+    if (num > arrSec[x + 1][y])
+      return false;
+  }
+  // 右下角
+  num = getSecNum(x + 1, y + 1);
+  if (arrSec[x + 1][y + 1] != -1)
+  {
+    if (x == n - 1 && y == n - 1 && num != arrSec[x + 1][y + 1])
+      return false;
+    if (num > arrSec[x + 1][y + 1])
+      return false;
   }
   return true;
 }
 
-// 对矩形设置值
-void setRect(int xmin, int ymin, int xmax, int ymax, int v)
-{
-  int i, j;
-  for (i = xmin; i <= xmax; ++i)
-    for (j = ymin; j <= ymax; ++j)
-      arr[i][j] = v;
-}
+//交叉点坐标终点
+int endx, endy;
 
-int judgeTeam(int xmin, int ymin, int xmax, int ymax)
+// 入参为交叉点坐标
+bool loop(int x, int y, bool init)
 {
-  int i, j;
-  int index = -1;
-  for (i = 1; i < glen; ++i)
+  if (init && x == endx && y == endy)
+    return true;
+  // 向左上
+  if (x != 0 && y != 0 && !arrLineLoop[x - 1][y - 1] && arrLine[x - 1][y - 1] == -1)
   {
-    if (groups[i].hasFind)
-      continue;
-    if (groups[i].x >= xmin && groups[i].x <= xmax && groups[i].y >= ymin && groups[i].y <= ymax)
-    {
-      if (index != -1)
-        return -1;
-      index = i;
-    }
+    arrLineLoop[x - 1][y - 1] = 1;
+    if (loop(x - 1, y - 1, false))
+      return true;
+    arrLineLoop[x - 1][y - 1] = 0;
   }
-  if (index == -1)
-    return index;
-  if (groups[index].num != (xmax - xmin + 1) * (ymax - ymin + 1))
-    return -1;
-  return index;
+  // 向右上
+  if (x != 0 && y != n && !arrLineLoop[x - 1][y] && arrLine[x - 1][y] == 1)
+  {
+    arrLineLoop[x - 1][y] = 1;
+    if (loop(x - 1, y + 1, false))
+      return true;
+    arrLineLoop[x - 1][y] = 0;
+  }
+  // 向左下
+  if (x != n && y != 0 && !arrLineLoop[x][y - 1] && arrLine[x][y - 1] == 1)
+  {
+    arrLineLoop[x][y - 1] = 1;
+    if (loop(x + 1, y - 1, false))
+      return true;
+    arrLineLoop[x][y - 1] = 0;
+  }
+  // 向右下
+  if (x != n && y != n && !arrLineLoop[x][y] && arrLine[x][y] == -1)
+  {
+    arrLineLoop[x][y] = 1;
+    if (loop(x + 1, y + 1, false))
+      return true;
+    arrLineLoop[x][y] = 0;
+  }
+  return false;
 }
 
+// 入参为交叉点坐标
+bool judgeLoop(int x, int y)
+{
+  endx = x;
+  endy = y;
+  memset(arrLineLoop, 0, sizeof(arrLineLoop));
+  if (loop(x, y, true))
+    return false;
+  return true;
+}
+
+// 入参为方块坐标
 bool computed(int x, int y)
 {
   if (x >= n)
     return true;
   if (y >= n)
     return computed(x + 1, 0);
-  if (arr[x][y])
-    return computed(x, y + 1);
-  int i, j;
-  int t;
-  for (i = x; i < n; ++i)
-  {
-    for (j = y; j < n; ++j)
-    {
-      if (!judgeRect(x, y, i, j))
-        continue;
-      t = judgeTeam(x, y, i, j);
-      if (t <= 0)
-        continue;
-      groups[t].hasFind = true;
-      setRect(x, y, i, j, t);
-      if (computed(x, y + 1))
-        return true;
-      setRect(x, y, i, j, 0);
-      groups[t].hasFind = false;
-    }
-  }
+  arrLine[x][y] = 1;
+  if (judgeSec(x, y) && judgeLoop(x, y + 1) && computed(x, y + 1))
+    return true;
+  arrLine[x][y] = -1;
+  if (judgeSec(x, y) && judgeLoop(x, y) && computed(x, y + 1))
+    return true;
+  arrLine[x][y] = 0;
   return false;
-}
-
-void output()
-{
-  int i, j;
-  int groupMap[30] = {};
-  int gi = 0;
-  for (i = 0; i < n; ++i)
-  {
-    for (j = 0; j < n; ++j)
-    {
-      if (!groupMap[arr[i][j]])
-        groupMap[arr[i][j]] = ++gi;
-
-      printf("%c", groupMap[arr[i][j]] + 'A' - 1);
-    }
-    putchar('\n');
-  }
 }
 
 int main()
 {
-  int i, j, kt;
+  int N, n, i, j;
   char c;
-  while (scanf("%d %d", &n, &k) == 2 && n > 0 & k > 0)
+  scanf("%d", &N);
+  while (N--)
   {
-    memset(groups, 0, sizeof(groups));
-    memset(arr, 0, sizeof(arr));
-    glen = 0;
-    kt = 1;
-    for (i = 0; i < n; ++i)
+    memset(arrLine, 0, sizeof(arrLine));
+    memset(arrSec, 0, sizeof(arrSec));
+    scanf("%d", &n);
+    for (i = 0; i <= n; ++i)
     {
       getchar();
-      for (j = 0; j < n; ++j)
+      for (j = 0; j <= n; ++j)
       {
         c = getchar();
-        if (c != '.')
-        {
-          groups[kt] = {i, j, c - '0', false};
-          ++kt;
-        }
+        if (c == '.')
+          arrSec[i][j] = -1;
+        else
+          arrSec[i][j] = c - '0';
       }
     }
-    glen = kt;
-    if (!computed(0, 0))
+    computed(0, 0);
+    for (i = 0; i < n; ++i)
     {
-      printf("xxx\n");
-      continue;
+      for (j = 0; j < n; ++j)
+      {
+        printf("%c", arrLine[i][j] == 1 ? '/' : '\\');
+      }
+      putchar('\n');
     }
-    output();
   }
   return 0;
 }
