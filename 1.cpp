@@ -4,7 +4,7 @@
 int arrWall[8][8];
 int Steps[4][2] = {{0, -1}, {-1, 0}, {0, 1}, {1, 0}};
 char StepConvert[4] = {'W', 'N', 'E', 'S'};
-int stepArr[1000];
+int stepArr[100000];
 
 int stepMax;
 
@@ -28,6 +28,8 @@ bool computed(int x, int y, int stepNum)
         k = 1 << i;
         newX = x + Steps[i][0];
         newY = y + Steps[i][1];
+        hasWall = false;
+        // 有墙
         if (arrWall[x][y] & k)
         {
             hasWall = true;
@@ -61,7 +63,7 @@ int main()
     {
         t = x;
         x = y;
-        t = t;
+        y = t;
         x = x - 1;
         y = y - 1;
         memset(arrWall, 0, sizeof(arrWall));
