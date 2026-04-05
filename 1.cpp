@@ -1,170 +1,88 @@
 #include <stdio.h>
 #include <string.h>
 
-// 1 / -1 \ 0 空
-int arrLine[10][10];
-int arrLineLoop[10][10];
-int arrSec[10][10];
-int n;
+int arrWall[8][8];
+int Steps[4][2] = {{0, -1}, {-1, 0}, {0, 1}, {1, 0}};
+char StepConvert[4] = {'W', 'N', 'E', 'S'};
+int stepArr[1000];
 
-// 入参为交叉点坐标
-int getSecNum(int x, int y)
-{
-  int num = 0;
-  // 左上角
-  if (x != 0 && y != 0)
-    num += arrLine[x - 1][y - 1] == -1;
-  // 右上角
-  if (x != 0 && y != n)
-    num += arrLine[x - 1][y] == 1;
-  // 左下角
-  if (x != n && y != 0)
-    num += arrLine[x][y - 1] == 1;
-  // 右下角
-  if (x != n && y != n)
-    num += arrLine[x][y] == -1;
-  return num;
-}
+int stepMax;
 
-// 入参为方块坐标
-bool judgeSec(int x, int y)
+bool outXY(int x, int y)
 {
-  int num;
-  // 左上角
-  if (arrSec[x][y] != -1 && getSecNum(x, y) != arrSec[x][y])
+    if (x < 0 || x >= 4 || y < 0 || y >= 6)
+        return true;
     return false;
-  // 右上角
-  num = getSecNum(x, y + 1);
-  if (arrSec[x][y + 1] != -1)
-  {
-    if (y == n - 1 && num != arrSec[x][y + 1])
-      return false;
-    if (num > arrSec[x][y + 1])
-      return false;
-  }
-  // 左下角
-  num = getSecNum(x + 1, y);
-  if (arrSec[x + 1][y] != -1)
-  {
-    if (x == n - 1 && num != arrSec[x + 1][y])
-      return false;
-    if (num > arrSec[x + 1][y])
-      return false;
-  }
-  // 右下角
-  num = getSecNum(x + 1, y + 1);
-  if (arrSec[x + 1][y + 1] != -1)
-  {
-    if (x == n - 1 && y == n - 1 && num != arrSec[x + 1][y + 1])
-      return false;
-    if (num > arrSec[x + 1][y + 1])
-      return false;
-  }
-  return true;
 }
 
-// 交叉点坐标终点
-int endx, endy;
-
-// 入参为交叉点坐标
-bool loop(int x, int y, bool init)
+bool computed(int x, int y, int stepNum)
 {
-  if (!init && x == endx && y == endy)
-    return true;
-  // 向左上
-  if (x != 0 && y != 0 && !arrLineLoop[x - 1][y - 1] && arrLine[x - 1][y - 1] == -1)
-  {
-    arrLineLoop[x - 1][y - 1] = 1;
-    if (loop(x - 1, y - 1, false))
-      return true;
-    arrLineLoop[x - 1][y - 1] = 0;
-  }
-  // 向右上
-  if (x != 0 && y != n && !arrLineLoop[x - 1][y] && arrLine[x - 1][y] == 1)
-  {
-    arrLineLoop[x - 1][y] = 1;
-    if (loop(x - 1, y + 1, false))
-      return true;
-    arrLineLoop[x - 1][y] = 0;
-  }
-  // 向左下
-  if (x != n && y != 0 && !arrLineLoop[x][y - 1] && arrLine[x][y - 1] == 1)
-  {
-    arrLineLoop[x][y - 1] = 1;
-    if (loop(x + 1, y - 1, false))
-      return true;
-    arrLineLoop[x][y - 1] = 0;
-  }
-  // 向右下
-  if (x != n && y != n && !arrLineLoop[x][y] && arrLine[x][y] == -1)
-  {
-    arrLineLoop[x][y] = 1;
-    if (loop(x + 1, y + 1, false))
-      return true;
-    arrLineLoop[x][y] = 0;
-  }
-  return false;
-}
-
-// 入参为交叉点坐标
-bool judgeLoop(int x, int y)
-{
-  endx = x;
-  endy = y;
-  memset(arrLineLoop, 0, sizeof(arrLineLoop));
-  if (loop(x, y, true))
+    if (outXY(x, y))
+        return true;
+    if (stepNum >= stepMax)
+        return false;
+    int i, j, k, newX, newY;
+    bool hasWall;
+    for (i = 0; i < 4; ++i)
+    {
+        k = 1 << i;
+        newX = x + Steps[i][0];
+        newY = y + Steps[i][1];
+        if (arrWall[x][y] & k)
+        {
+            hasWall = true;
+            // 到边缘
+            if (outXY(newX, newY))
+                continue;
+            // 再隔一层也有墙
+            if (arrWall[newX][newY] & k)
+                continue;
+            arrWall[newX][newY] += k;
+            arrWall[x][y] -= k;
+        }
+        stepArr[stepNum] = i;
+        if (computed(newX, newY, stepNum + 1))
+            return true;
+        // 回退墙
+        if (hasWall)
+        {
+            arrWall[newX][newY] -= k;
+            arrWall[x][y] += k;
+        }
+    }
     return false;
-  return true;
-}
-
-// 入参为方块坐标
-bool computed(int x, int y)
-{
-  if (x >= n)
-    return true;
-  if (y >= n)
-    return computed(x + 1, 0);
-  arrLine[x][y] = 1;
-  if (judgeSec(x, y) && judgeLoop(x, y + 1) && computed(x, y + 1))
-    return true;
-  arrLine[x][y] = -1;
-  if (judgeSec(x, y) && judgeLoop(x, y) && computed(x, y + 1))
-    return true;
-  arrLine[x][y] = 0;
-  return false;
 }
 
 int main()
 {
-  int N, i, j;
-  char c;
-  scanf("%d", &N);
-  while (N--)
-  {
-    memset(arrLine, 0, sizeof(arrLine));
-    memset(arrSec, 0, sizeof(arrSec));
-    scanf("%d", &n);
-    for (i = 0; i <= n; ++i)
+    int x, y, t;
+    int i, j, k;
+    while (scanf("%d %d", &x, &y) == 2 && x != 0 && y != 0)
     {
-      getchar();
-      for (j = 0; j <= n; ++j)
-      {
-        c = getchar();
-        if (c == '.')
-          arrSec[i][j] = -1;
-        else
-          arrSec[i][j] = c - '0';
-      }
+        t = x;
+        x = y;
+        t = t;
+        x = x - 1;
+        y = y - 1;
+        memset(arrWall, 0, sizeof(arrWall));
+        for (i = 0; i < 4; ++i)
+        {
+            for (j = 0; j < 6; ++j)
+            {
+                scanf("%d", &arrWall[i][j]);
+            }
+        }
+        for (i = 0;; ++i)
+        {
+            stepMax = i;
+            if (computed(x, y, 0))
+                break;
+        }
+        for (j = 0; j < i; ++j)
+        {
+            putchar(StepConvert[stepArr[j]]);
+        }
+        putchar('\n');
     }
-    computed(0, 0);
-    for (i = 0; i < n; ++i)
-    {
-      for (j = 0; j < n; ++j)
-      {
-        printf("%c", arrLine[i][j] == 1 ? '/' : '\\');
-      }
-      putchar('\n');
-    }
-  }
-  return 0;
+    return 0;
 }
