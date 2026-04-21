@@ -1,79 +1,43 @@
 #include <stdio.h>
 
-int arrOrigin[35];
-int len;
-int arr[35];
-int stepArr[70];
-int stepLen;
+int arr[2][55][55];
 
-int findMax(int i)
+char output(int i)
 {
-    int maxi = i;
-    for (int j = i - 1; j >= 0; --j)
-    {
-        if (arr[j] > arr[maxi])
-            maxi = j;
-    }
-    return maxi;
-}
-
-void flip(int i)
-{
-    int t;
-    for (int j = 0; j <= i / 2; ++j)
-    {
-        t = arr[j];
-        arr[j] = arr[i - j];
-        arr[i - j] = t;
-    }
-}
-
-void loop()
-{
-    int i, maxi;
-    for (i = len - 1; i > 0; --i)
-    {
-        maxi = findMax(i);
-        if (maxi == i)
-            continue;
-        if (maxi != 0)
-        {
-            flip(maxi);
-            stepArr[stepLen++] = maxi;
-        }
-        flip(i);
-        stepArr[stepLen++] = i;
-    }
+  if (i < 26)
+  {
+    return i + 'A';
+  }
+  return i - 26 + 'a';
 }
 
 int main()
 {
-    int i;
-    while (1)
+  int i, j, k, n;
+  while (scanf("%d", &n) > 0)
+  {
+    for (i = 0; i < n; ++i)
     {
-        len = 0;
-        while (scanf("%d", &arrOrigin[len]) > 0)
-        {
-            arr[len] = arrOrigin[len];
-            ++len;
-            if (getchar() == '\n')
-                break;
-        }
-        if (len == 0)
-            return 0;
-        stepLen = 0;
-        loop();
-        for (i = 0; i < len; ++i)
-        {
-            if (i != 0)
-                putchar(' ');
-            printf("%d", arrOrigin[i]);
-        }
-        putchar('\n');
-        for (i = 0; i < stepLen; ++i)
-            printf("%d ", len - stepArr[i]);
-        putchar('0');
-        putchar('\n');
+      for (j = 0; j < n; ++j)
+      {
+        arr[0][i][j] = i;
+        arr[1][i][j] = j;
+      }
     }
-    return 0;
+    printf("%d %d %d\n", 2, n, n);
+    for (i = 0; i < n; ++i)
+    {
+      for (j = 0; j < n; ++j)
+        printf("%c", output(arr[0][i][j]));
+      putchar('\n');
+    }
+    putchar('\n');
+    for (i = 0; i < n; ++i)
+    {
+      for (j = 0; j < n; ++j)
+        printf("%c", output(arr[1][i][j]));
+      putchar('\n');
+    }
+    putchar('\n');
+  }
 }
