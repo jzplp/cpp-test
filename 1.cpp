@@ -1,43 +1,81 @@
 #include <stdio.h>
+#include <stdlib.h>
 
-int arr[2][55][55];
+int arr[4][4100];
+int n;
+int count = 0;
+int addArr[17000000];
 
-char output(int i)
+int compare(const void *left, const void *right)
 {
-  if (i < 26)
+  return *(int *)left - *(int *)right;
+}
+
+int lowerBound(int num)
+{
+  int beg = 0, end = n * n, mid;
+  while (end > beg)
   {
-    return i + 'A';
+    mid = beg + (end - beg) / 2;
+    if (addArr[mid] >= num)
+      end = mid;
+    if (addArr[mid] < num)
+      beg = mid + 1;
   }
-  return i - 26 + 'a';
+  return beg;
+}
+
+int upperBound(int num)
+{
+  int beg = 0, end = n * n, mid;
+  while (end > beg)
+  {
+    mid = beg + (end - beg) / 2;
+    if (addArr[mid] > num)
+      end = mid;
+    if (addArr[mid] <= num)
+      beg = mid + 1;
+  }
+  return beg;
+}
+
+void computed()
+{
+  int i, j, sum, upper, lower;
+  for (i = 0; i < n; ++i)
+  {
+    for (j = 0; j < n; ++j)
+      addArr[i * n + j] = arr[0][i] + arr[1][j];
+  }
+  qsort(addArr, n * n, sizeof(int), compare);
+  for (i = 0; i < n; ++i)
+  {
+    for (j = 0; j < n; ++j)
+    {
+      sum = arr[2][i] + arr[3][j];
+      upper = upperBound(-sum);
+      lower = lowerBound(-sum);
+      count += upper - lower;
+    }
+  }
 }
 
 int main()
 {
-  int i, j, k, n;
-  while (scanf("%d", &n) > 0)
+  int t, i, j;
+  scanf("%d", &t);
+  while (t--)
   {
+    scanf("%d", &n);
     for (i = 0; i < n; ++i)
     {
-      for (j = 0; j < n; ++j)
-      {
-        arr[0][i][j] = i;
-        arr[1][i][j] = j;
-      }
+      for (j = 0; j < 4; ++j)
+        scanf("%d", &arr[j][i]);
     }
-    printf("%d %d %d\n", 2, n, n);
-    for (i = 0; i < n; ++i)
-    {
-      for (j = 0; j < n; ++j)
-        printf("%c", output(arr[0][i][j]));
+    count = 0;
+    computed();
+    printf("%d\n", count);
+    if (t != 0)
       putchar('\n');
-    }
-    putchar('\n');
-    for (i = 0; i < n; ++i)
-    {
-      for (j = 0; j < n; ++j)
-        printf("%c", output(arr[1][i][j]));
-      putchar('\n');
-    }
-    putchar('\n');
   }
 }
