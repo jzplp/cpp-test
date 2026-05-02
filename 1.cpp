@@ -1,81 +1,125 @@
 #include <stdio.h>
+#include <string.h>
 #include <stdlib.h>
 
-int arr[4][4100];
 int n;
-int count = 0;
-int addArr[17000000];
 
-int compare(const void *left, const void *right)
+struct Rect
 {
-  return *(int *)left - *(int *)right;
-}
+  int xl, yl, xr, yr;
+  int num;
+  int x, y;
+};
+Rect arr[5500];
 
-int lowerBound(int num)
+int compareX(const void *left, const void *right)
 {
-  int beg = 0, end = n * n, mid;
-  while (end > beg)
+  const Rect *l = (const Rect *)left;
+  const Rect *r = (const Rect *)right;
+  if (l->xr != r->xr)
   {
-    mid = beg + (end - beg) / 2;
-    if (addArr[mid] >= num)
-      end = mid;
-    if (addArr[mid] < num)
-      beg = mid + 1;
+    return l->xr - r->xr;
   }
-  return beg;
+  return l->xl - r->xl;
 }
 
-int upperBound(int num)
+bool computedX()
 {
-  int beg = 0, end = n * n, mid;
-  while (end > beg)
-  {
-    mid = beg + (end - beg) / 2;
-    if (addArr[mid] > num)
-      end = mid;
-    if (addArr[mid] <= num)
-      beg = mid + 1;
+  int i;
+  int curX = 0;
+  qsort(arr, n, sizeof(Rect), compareX);
+  for(i = 0 ; i < n; ++i) {
+    printf("%d %d\n", arr[i].xl, arr[i].xr);
   }
-  return beg;
-}
-
-void computed()
-{
-  int i, j, sum, upper, lower;
   for (i = 0; i < n; ++i)
   {
-    for (j = 0; j < n; ++j)
-      addArr[i * n + j] = arr[0][i] + arr[1][j];
-  }
-  qsort(addArr, n * n, sizeof(int), compare);
-  for (i = 0; i < n; ++i)
-  {
-    for (j = 0; j < n; ++j)
+    if (arr[i].xr < curX)
     {
-      sum = arr[2][i] + arr[3][j];
-      upper = upperBound(-sum);
-      lower = lowerBound(-sum);
-      count += upper - lower;
+      // printf("-- %d %d\n", arr[i].xr, curX);
+      return false;
     }
+    if (curX < arr[i].xl)
+    {
+      curX = arr[i].xl;
+      arr[i].x = arr[i].xl;
+    }
+    else
+    {
+      arr[i].x = curX;
+    }
+    printf("---- %d\n", arr[i].x);
+    ++curX;
   }
+  return true;
+}
+
+int compareY(const void *left, const void *right)
+{
+  const Rect *l = (const Rect *)left;
+  const Rect *r = (const Rect *)right;
+  if (l->yr != r->yr)
+  {
+    return l->yr - r->yr;
+  }
+  return l->yl - r->yl;
+}
+
+bool computedY()
+{
+  int i, j;
+  int curY = 0;
+  qsort(arr, n, sizeof(Rect), compareY);
+  for(i = 0 ; i < n; ++i) {
+    printf("%d %d\n", arr[i].yl, arr[i].yr);
+  }
+  for (i = 0; i < n; ++i)
+  {
+    if (arr[i].yr < curY)
+      return false;
+    if (curY < arr[i].yl)
+    {
+      curY = arr[i].yl;
+      arr[i].y = arr[i].yl;
+    }
+    else
+    {
+      arr[i].y = curY;
+    }
+    printf("---- %d\n", arr[i].y);
+    ++curY;
+  }
+  return true;
+}
+
+int compareIndex(const void *left, const void *right)
+{
+  const Rect *l = (const Rect *)left;
+  const Rect *r = (const Rect *)right;
+  return l->num - r->num;
 }
 
 int main()
 {
-  int t, i, j;
-  scanf("%d", &t);
-  while (t--)
+  int xl, yl, xr, yr, i, j;
+  while (scanf("%d", &n) > 0 && n > 0)
   {
-    scanf("%d", &n);
+    memset(arr, 0, sizeof(arr));
     for (i = 0; i < n; ++i)
     {
-      for (j = 0; j < 4; ++j)
-        scanf("%d", &arr[j][i]);
+      scanf("%d %d %d %d", &xl, &yl, &xr, &yr);
+      arr[i] = {xl - 1, yl - 1, xr - 1, yr - 1, i, -1, -1};
     }
-    count = 0;
-    computed();
-    printf("%d\n", count);
-    if (t != 0)
-      putchar('\n');
+    if (!computedX() || !computedY())
+    {
+      printf("IMPOSSIBLE\n");
+      continue;
+    }
+    qsort(arr, n, sizeof(Rect), compareIndex);
+    for (i = 0; i < n; ++i)
+    {
+      printf("%d %d\n", arr[i].x + 1, arr[i].y + 1);
+    }
   }
+
+  return 0;
 }
