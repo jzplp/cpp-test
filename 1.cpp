@@ -11,6 +11,7 @@ struct Rect
   int x, y;
 };
 Rect arr[5500];
+int arrMap[5500];
 
 int compareX(const void *left, const void *right)
 {
@@ -25,30 +26,25 @@ int compareX(const void *left, const void *right)
 
 bool computedX()
 {
-  int i;
-  int curX = 0;
+  int i, j;
+  int flag = 0;
   qsort(arr, n, sizeof(Rect), compareX);
-  for(i = 0 ; i < n; ++i) {
-    printf("%d %d\n", arr[i].xl, arr[i].xr);
-  }
+  memset(arrMap, 0, sizeof(arrMap));
   for (i = 0; i < n; ++i)
   {
-    if (arr[i].xr < curX)
+    flag = 0;
+    for (j = arr[i].xl; j <= arr[i].xr; ++j)
     {
-      // printf("-- %d %d\n", arr[i].xr, curX);
+      if (!arrMap[j])
+      {
+        arr[i].x = j;
+        flag = 1;
+        arrMap[j] = 1;
+        break;
+      }
+    }
+    if (flag == 0)
       return false;
-    }
-    if (curX < arr[i].xl)
-    {
-      curX = arr[i].xl;
-      arr[i].x = arr[i].xl;
-    }
-    else
-    {
-      arr[i].x = curX;
-    }
-    printf("---- %d\n", arr[i].x);
-    ++curX;
   }
   return true;
 }
@@ -67,26 +63,24 @@ int compareY(const void *left, const void *right)
 bool computedY()
 {
   int i, j;
-  int curY = 0;
+  int flag = 0;
   qsort(arr, n, sizeof(Rect), compareY);
-  for(i = 0 ; i < n; ++i) {
-    printf("%d %d\n", arr[i].yl, arr[i].yr);
-  }
+  memset(arrMap, 0, sizeof(arrMap));
   for (i = 0; i < n; ++i)
   {
-    if (arr[i].yr < curY)
+    flag = 0;
+    for (j = arr[i].yl; j <= arr[i].yr; ++j)
+    {
+      if (!arrMap[j])
+      {
+        arr[i].y = j;
+        flag = 1;
+        arrMap[j] = 1;
+        break;
+      }
+    }
+    if (flag == 0)
       return false;
-    if (curY < arr[i].yl)
-    {
-      curY = arr[i].yl;
-      arr[i].y = arr[i].yl;
-    }
-    else
-    {
-      arr[i].y = curY;
-    }
-    printf("---- %d\n", arr[i].y);
-    ++curY;
   }
   return true;
 }
