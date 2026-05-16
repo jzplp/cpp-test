@@ -1,24 +1,63 @@
-#include<stdio.h>
+#include <stdio.h>
+#include <math.h>
+#include <stdlib.h>
 
-struct Item {
+struct Item
+{
   int x, y;
   int t;
+  double angle;
 };
-
-Item arr[10010];
+// 原始数据
+Item arrOrigin[1010];
 int n;
 
+Item arr[1010];
 
-void computed() {
-  
+int compare(const void *left, const void *right)
+{
+  return ((const Item *)left)->angle - ((const Item *)right)->angle;
 }
 
-
-int main() {
+void computedI(int a)
+{
   int i, j;
-  while(scanf("%d", &n) > 0 && n > 0) {
-    for(i = 0; i < n; ++i)
-      scanf("%d %d %d", arr[i].x, arr[i].y, arr[i].t);
+  int x = arrOrigin[a].x, y = arrOrigin[a].y;
+  for (i = 0; i < n; ++i)
+  {
+    // 以第a个点为零点转换坐标系
+    arr[i].x = arrOrigin[i].x - x;
+    arr[i].y = arrOrigin[i].y - y;
+    arr[i].t = arrOrigin[i].t;
+    // 求atan2角度，最小角度0
+    arr[i].angle = fmod(atan2(arr[i].y, arr[i].x) + 2 * M_PI, 2 * M_PI);
+  }
+  // 从小到大排序
+  qsort(arr, n, sizeof(Item), compare);
+  // 输出排序结果
+  /*
+  for (i = 0; i < n; ++i)
+    printf("%d %d %lf\n", arr[i].x, arr[i].y, arr[i].angle);
+  */
+}
+
+void computed()
+{
+  int i, j, k;
+  for (i = 0; i < n; ++i)
+  {
+    computedI(i);
+  }
+}
+
+int main()
+{
+  int i, j;
+  printf("%lf --- \n", atan2(0, 0));
+  while (scanf("%d", &n) > 0 && n > 0)
+  {
+    for (i = 0; i < n; ++i)
+      scanf("%d %d %d", &arrOrigin[i].x, &arrOrigin[i].y, &arrOrigin[i].t);
   }
   computed();
 
