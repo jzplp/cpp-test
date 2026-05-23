@@ -21,7 +21,7 @@ int compare(const void *left, const void *right)
 
 void computedI(int a)
 {
-  int i, j;
+  int i, j, i1, j1, topWhite = 0, topBlack = 0, bottomWhite = 0, bottomBlack = 0;
   int x = arrOrigin[a].x, y = arrOrigin[a].y;
   for (i = 0; i < n; ++i)
   {
@@ -37,8 +37,21 @@ void computedI(int a)
   // 输出排序结果
   /*
   for (i = 0; i < n; ++i)
-    printf("%d %d %lf\n", arr[i].x, arr[i].y, arr[i].angle);
+    printf("%d %d %lf\n", arr[i].x, arr[i].y, arr[i].angle); 
   */
+  // 计算0-180度的数量
+  for(i = 0; i < n; ++i) {
+    if(arr[i].angle - M_PI < 10e-8) break;
+    if(arr[i].t) ++topWhite;
+    else ++topBlack;
+  }
+  // 计算180-360度的数量
+  for(; i < n; ++i) {
+    if(arr[i].angle - M_PI < 10e-8) continue;
+    if(arr[i].t) ++bottomWhite;
+    else ++bottomBlack;
+  }
+
 }
 
 void computed()
@@ -47,6 +60,7 @@ void computed()
   for (i = 0; i < n; ++i)
   {
     computedI(i);
+    
   }
 }
 
