@@ -70,7 +70,7 @@ int getRes(int topWhite, int topBlack, int bottomWhite, int bottomBlack, int lin
 // 计算
 int computedI()
 {
-  int i, j, i1, i2, j1, j2 = 0, ii, jj;
+  int i, j, i1, i2, j1, j2 = 0, ii, jj, preAngle = 0, t;
   int topWhite = 0, topBlack = 0, bottomWhite = 0, bottomBlack = 0, lineLeftWhite = 0, lineLeftBlack = 0, lineRightWhite = 0, lineRightBlack = 0;
   int maxRes = 0, res;
   // 计算起始个数
@@ -132,14 +132,37 @@ int computedI()
   while (i < j2)
   {
     ii = getNextIndex(i + 1);
-    bottomWhite += lineLeftWhite;
-    bottomBlack += lineLeftBlack;
-    topWhite += lineRightWhite;
-    topBlack += lineRightBlack;
-    lineLeftWhite = 0;
-    lineLeftBlack = 0;
-    lineRightWhite = 0;
-    lineRightBlack = 0;
+    if (abs(fmod(preAngle - arr[i].angle + 2 * M_PI, 2 * M_PI) - M_PI) < MIN_DIFF)
+    {
+      t = lineLeftWhite;
+      lineLeftWhite = lineRightWhite;
+      lineRightWhite = t;
+      t = lineRightBlack;
+      lineRightBlack = lineLeftBlack;
+      lineLeftBlack = t;
+    }
+    else if (fmod(preAngle - arr[i].angle + 2 * M_PI, 2 * M_PI) < M_PI)
+    {
+      bottomWhite += lineLeftWhite;
+      bottomBlack += lineLeftBlack;
+      topWhite += lineRightWhite;
+      topBlack += lineRightBlack;
+      lineLeftWhite = 0;
+      lineLeftBlack = 0;
+      lineRightWhite = 0;
+      lineRightBlack = 0;
+    }
+    else if (fmod(preAngle - arr[i].angle + 2 * M_PI, 2 * M_PI) > M_PI)
+    {
+      bottomWhite += lineRightWhite;
+      bottomBlack += lineRightBlack;
+      topWhite += lineLeftWhite;
+      topBlack += lineLeftBlack;
+      lineLeftWhite = 0;
+      lineLeftBlack = 0;
+      lineRightWhite = 0;
+      lineRightBlack = 0;
+    }
     while (abs(arr[ii].angle - arr[i].angle) < MIN_DIFF)
     {
       if (arr[ii].t)
