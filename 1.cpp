@@ -2,6 +2,8 @@
 #include <math.h>
 #include <stdlib.h>
 
+#define MIN_DIFF 10e-8
+
 struct Item
 {
   int x, y;
@@ -42,30 +44,74 @@ void preI(int a)
   */
 }
 
+int getRes(int topWhite, int topBlack, int bottomWhite, int bottomBlack, int line)
+{
+  int res1 = topWhite + bottomBlack + line;
+  int res2 = topBlack + bottomWhite + line;
+  return res1 > res2 ? res1 : res2;
+}
+
 // 计算
 void computedI()
 {
-  int i, j, i1, j1, topWhite = 0, topBlack = 0, bottomWhite = 0, bottomBlack = 0, lineLeft = 0, lineRight = 0;
+  int i, j, i1, i2, j1, j2 = 0;
+  int topWhite = 0, topBlack = 0, bottomWhite = 0, bottomBlack = 0, lineLeftWhite = 0, lineLeftBlack = 0, lineRightWhite = 0, lineRightBlack = 0;
+  int maxRes = 0, res;
   // 计算起始个数
   // 计算0-180度的数量
   for (i = 1; i < n; ++i)
   {
-    if (arr[i].angle - M_PI < 10e-8)
+    if (arr[i].angle < MIN_DIFF)
+    {
+      if (arr[i].t)
+        ++lineLeftWhite;
+      else
+        ++lineLeftBlack;
+      continue;
+    }
+    if (abs(arr[i].angle - M_PI) < MIN_DIFF)
       break;
     if (arr[i].t)
       ++topWhite;
     else
       ++topBlack;
   }
+  i1 = lineLeftWhite + lineLeftBlack + 1;
+  i2 = i;
   // 计算180-360度的数量
   for (; i < n; ++i)
   {
-    if (arr[i].angle - M_PI < 10e-8)
+    if (abs(arr[i].angle - M_PI) < MIN_DIFF)
+    {
+      if (arr[i].t)
+        ++lineRightWhite;
+      else
+        ++lineRightBlack;
+      j1 = i;
       continue;
+    }
+    if (abs(arr[i].angle - 2 * M_PI) < MIN_DIFF)
+    {
+      if (!j2)
+        j2 = j;
+      if (arr[i].t)
+        ++lineLeftWhite;
+      else
+        ++lineLeftBlack;
+      continue;
+    }
     if (arr[i].t)
       ++bottomWhite;
     else
       ++bottomBlack;
+  }
+  if (lineLeftWhite + lineLeftBlack + lineRightWhite + lineRightBlack > 0)
+  {
+    maxRes = getRes(topWhite, topBlack, bottomWhite, bottomBlack, lineLeftWhite + lineLeftBlack + lineRightWhite + lineRightBlack);
+  }
+  for (i = i1; i < j2; ++i)
+  {
+    
   }
 }
 
