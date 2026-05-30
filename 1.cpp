@@ -4,12 +4,23 @@
 
 #define MIN_DIFF 10e-8
 
+/*
+  点type的分类
+  1 原点
+  2 在左侧线上的点
+  3 在右侧线上的点
+  4 在左侧点
+  5 在右侧点
+*/
+
 struct Item
 {
   int x, y;
   int t;
   double angle;
+  int type;
 };
+
 // 原始数据
 Item arrOrigin[1010];
 int n;
@@ -64,7 +75,7 @@ int computedI()
   int maxRes = 0, res;
   // 计算起始个数
   // 计算0-180度的数量
-  for (i = 1; i < n; ++i)
+  for (i = 0; i < n; ++i)
   {
     if (arr[i].angle < MIN_DIFF)
     {
@@ -81,6 +92,7 @@ int computedI()
     else
       ++topBlack;
   }
+
   i1 = lineLeftWhite + lineLeftBlack + 1;
   i2 = i;
   // 计算180-360度的数量
@@ -174,6 +186,8 @@ int computedI()
     res = getRes(topWhite, topBlack, bottomWhite, bottomBlack, lineLeftWhite + lineLeftBlack + lineRightWhite + lineRightBlack);
     if (res > maxRes)
       maxRes = res;
+    i = ii;
+    j = jj;
   }
   return maxRes;
 }
