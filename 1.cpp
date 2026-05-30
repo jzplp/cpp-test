@@ -199,7 +199,7 @@ int main()
   {
     for (i = 0; i < n; ++i)
       scanf("%d %d %d", &arrOrigin[i].x, &arrOrigin[i].y, &arrOrigin[i].t);
+    printf("%d\n", computed());
   }
-  printf("%d\n", computed());
   return 0;
 }
