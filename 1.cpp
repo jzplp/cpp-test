@@ -44,17 +44,22 @@ void preI(int a)
   */
 }
 
+int getNextIndex(int i)
+{
+  return (i % n) == 0 ? 1 : i % n;
+}
+
 int getRes(int topWhite, int topBlack, int bottomWhite, int bottomBlack, int line)
 {
   int res1 = topWhite + bottomBlack + line;
   int res2 = topBlack + bottomWhite + line;
-  return res1 > res2 ? res1 : res2;
+  return (res1 > res2 ? res1 : res2) + 1;
 }
 
 // 计算
-void computedI()
+int computedI()
 {
-  int i, j, i1, i2, j1, j2 = 0;
+  int i, j, i1, i2, j1, j2 = 0, ii, jj;
   int topWhite = 0, topBlack = 0, bottomWhite = 0, bottomBlack = 0, lineLeftWhite = 0, lineLeftBlack = 0, lineRightWhite = 0, lineRightBlack = 0;
   int maxRes = 0, res;
   // 计算起始个数
@@ -109,32 +114,92 @@ void computedI()
   {
     maxRes = getRes(topWhite, topBlack, bottomWhite, bottomBlack, lineLeftWhite + lineLeftBlack + lineRightWhite + lineRightBlack);
   }
-  for (i = i1; i < j2; ++i)
+  // 准备工作结束，开始遍历
+  i = i1;
+  j = j1;
+  while (i < j2)
   {
-    
+    ii = getNextIndex(i + 1);
+    bottomWhite += lineLeftWhite;
+    bottomBlack += lineLeftBlack;
+    topWhite += lineRightWhite;
+    topBlack += lineRightBlack;
+    lineLeftWhite = 0;
+    lineLeftBlack = 0;
+    lineRightWhite = 0;
+    lineRightBlack = 0;
+    while (abs(arr[ii].angle - arr[i].angle) < MIN_DIFF)
+    {
+      if (arr[ii].t)
+      {
+        --topWhite;
+        ++lineLeftWhite;
+      }
+      else
+      {
+        --topBlack;
+        ++lineLeftBlack;
+      }
+      ii = getNextIndex(ii + 1);
+    }
+    jj = getNextIndex(j + 1);
+    while (fmod(arr[jj].angle + 3 * M_PI - arr[i].angle, 2 * M_PI) > MIN_DIFF)
+    {
+      if (arr[jj].t)
+      {
+        --bottomWhite;
+        ++topWhite;
+      }
+      else
+      {
+        --bottomBlack;
+        ++topBlack;
+      }
+      jj = getNextIndex(jj + 1);
+    }
+    while (abs(fmod(arr[jj].angle + 3 * M_PI - arr[i].angle, 2 * M_PI)) < MIN_DIFF)
+    {
+      if (arr[jj].t)
+      {
+        --bottomWhite;
+        ++lineRightWhite;
+      }
+      else
+      {
+        --bottomBlack;
+        ++lineRightBlack;
+      }
+      jj = getNextIndex(jj + 1);
+    }
+    res = getRes(topWhite, topBlack, bottomWhite, bottomBlack, lineLeftWhite + lineLeftBlack + lineRightWhite + lineRightBlack);
+    if (res > maxRes)
+      maxRes = res;
   }
+  return maxRes;
 }
 
-void computed()
+int computed()
 {
   int i, j, k;
+  int maxRes = 0, res;
   for (i = 0; i < n; ++i)
   {
     preI(i);
-    computedI();
+    res = computedI();
+    if (res > maxRes)
+      maxRes = res;
   }
+  return maxRes;
 }
 
 int main()
 {
   int i, j;
-  printf("%lf --- \n", atan2(0, 0));
   while (scanf("%d", &n) > 0 && n > 0)
   {
     for (i = 0; i < n; ++i)
       scanf("%d %d %d", &arrOrigin[i].x, &arrOrigin[i].y, &arrOrigin[i].t);
   }
-  computed();
-
+  printf("%d\n", computed());
   return 0;
 }
