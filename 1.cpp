@@ -4,24 +4,11 @@
 
 #define MIN_DIFF 10e-8
 
-/*
-  type 点的类型
-  topWhite 1
-  topBlack 2
-  bottomWhite 3
-  bottomBlack 4
-  lineLeftWhite 5
-  lineLeftBlack 6
-  lineRightWhite 7
-  lineRightBlack 8
-*/
-
 struct Item
 {
   int x, y;
   int t;
   double angle;
-  int type;
 };
 
 // 原始数据
@@ -61,30 +48,6 @@ void preI(int a)
   qsort(arr, n - 1, sizeof(Item), compare);
 }
 
-int getNextIndex(int i)
-{
-  return i % (n - 1);
-}
-
-bool getState(int i, int j)
-{
-  if (getEqualAngle(arr[i].angle, arr[j].angle))
-    return false;
-  double anglei = fmod(arr[i].angle + M_PI, 2 * M_PI), anglej = arr[j].angle;
-  // printf("qqq %lf %lf\n", anglei, anglej);
-  if (getEqualAngle(anglei, anglej))
-    return false;
-  if (anglei > anglej)
-  {
-    if (anglei - anglej < M_PI)
-      return true;
-    return false;
-  }
-  if (anglei + 2 * M_PI - anglej < M_PI)
-    return true;
-  return false;
-}
-
 int getRes(int topWhite, int topBlack, int bottomWhite, int bottomBlack, int line)
 {
   int res1 = topWhite + bottomBlack;
@@ -106,29 +69,17 @@ int computedI()
     if (arr[i].angle < MIN_DIFF)
     {
       if (arr[i].t)
-      {
         ++lineLeftWhite;
-        arr[i].type = 3;
-      }
       else
-      {
         ++lineLeftBlack;
-        arr[i].type = 4;
-      }
       continue;
     }
     if (abs(arr[i].angle - M_PI) < MIN_DIFF || arr[i].angle > M_PI)
       break;
     if (arr[i].t)
-    {
       ++topWhite;
-      arr[i].type = 1;
-    }
     else
-    {
       ++topBlack;
-      arr[i].type = 2;
-    }
   }
 
   i1 = lineLeftWhite + lineLeftBlack;
@@ -139,15 +90,9 @@ int computedI()
     if (abs(arr[i].angle - M_PI) < MIN_DIFF)
     {
       if (arr[i].t)
-      {
         ++lineRightWhite;
-        arr[i].type = 3;
-      }
       else
-      {
         ++lineRightBlack;
-        arr[i].type = 4;
-      }
       j1 = i;
       continue;
     }
@@ -156,27 +101,15 @@ int computedI()
       if (!j2)
         j2 = j;
       if (arr[i].t)
-      {
         ++lineLeftWhite;
-        arr[i].type = 5;
-      }
       else
-      {
         ++lineLeftBlack;
-        arr[i].type = 6;
-      }
       continue;
     }
     if (arr[i].t)
-    {
       ++bottomWhite;
-      arr[i].type = 3;
-    }
     else
-    {
       ++bottomBlack;
-      arr[i].type = 4;
-    }
   }
   maxRes = getRes(topWhite, topBlack, bottomWhite, bottomBlack, lineLeftWhite + lineLeftBlack + lineRightWhite + lineRightBlack);
 
@@ -268,7 +201,6 @@ int computedI()
     if (res > maxRes)
       maxRes = res;
   }
-
   while (j < j2)
   {
     topWhite += lineRightWhite;
