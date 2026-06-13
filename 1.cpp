@@ -4,6 +4,18 @@
 
 #define MIN_DIFF 10e-8
 
+/*
+  type 点的类型
+  topWhite 1
+  topBlack 2
+  bottomWhite 3
+  bottomBlack 4
+  lineLeftWhite 5
+  lineLeftBlack 6
+  lineRightWhite 7
+  lineRightBlack 8
+*/
+
 struct Item
 {
   int x, y;
@@ -35,7 +47,7 @@ void preI(int a)
   int x = arrOrigin[a].x, y = arrOrigin[a].y;
   for (i = 0; i < n; ++i)
   {
-    if (i == a)
+    if (i == a) // 去掉原点本身
       continue;
     // 以第a个点为零点转换坐标系
     arr[j].x = arrOrigin[i].x - x;
@@ -47,11 +59,6 @@ void preI(int a)
   }
   // 从小到大排序
   qsort(arr, n - 1, sizeof(Item), compare);
-  // 输出排序结果
-  /*
-  for (i = 0; i < n-1; ++i)
-    printf("%d %d %lf\n", arr[i].x, arr[i].y, arr[i].angle);
-  */
 }
 
 int getNextIndex(int i)
@@ -61,7 +68,8 @@ int getNextIndex(int i)
 
 bool getState(int i, int j)
 {
-  if(getEqualAngle(arr[i].angle, arr[j].angle)) return false;
+  if (getEqualAngle(arr[i].angle, arr[j].angle))
+    return false;
   double anglei = fmod(arr[i].angle + M_PI, 2 * M_PI), anglej = arr[j].angle;
   // printf("qqq %lf %lf\n", anglei, anglej);
   if (getEqualAngle(anglei, anglej))
@@ -87,7 +95,8 @@ int getRes(int topWhite, int topBlack, int bottomWhite, int bottomBlack, int lin
 // 计算
 int computedI()
 {
-  int i, j, i1, i2, j1, j2 = 0, ii, jj, preAngle = 0, t;
+  int i, j, i1, i2, j1, j2 = 0, ii, jj;
+  double ai, aj, a;
   int topWhite = 0, topBlack = 0, bottomWhite = 0, bottomBlack = 0, lineLeftWhite = 0, lineLeftBlack = 0, lineRightWhite = 0, lineRightBlack = 0;
   int maxRes = 0, res;
   // 计算起始个数
@@ -97,17 +106,29 @@ int computedI()
     if (arr[i].angle < MIN_DIFF)
     {
       if (arr[i].t)
+      {
         ++lineLeftWhite;
+        arr[i].type = 3;
+      }
       else
+      {
         ++lineLeftBlack;
+        arr[i].type = 4;
+      }
       continue;
     }
     if (abs(arr[i].angle - M_PI) < MIN_DIFF || arr[i].angle > M_PI)
       break;
     if (arr[i].t)
+    {
       ++topWhite;
+      arr[i].type = 1;
+    }
     else
+    {
       ++topBlack;
+      arr[i].type = 2;
+    }
   }
 
   i1 = lineLeftWhite + lineLeftBlack;
@@ -118,9 +139,15 @@ int computedI()
     if (abs(arr[i].angle - M_PI) < MIN_DIFF)
     {
       if (arr[i].t)
+      {
         ++lineRightWhite;
+        arr[i].type = 3;
+      }
       else
+      {
         ++lineRightBlack;
+        arr[i].type = 4;
+      }
       j1 = i;
       continue;
     }
@@ -129,169 +156,150 @@ int computedI()
       if (!j2)
         j2 = j;
       if (arr[i].t)
+      {
         ++lineLeftWhite;
+        arr[i].type = 5;
+      }
       else
+      {
         ++lineLeftBlack;
+        arr[i].type = 6;
+      }
       continue;
     }
     if (arr[i].t)
+    {
       ++bottomWhite;
+      arr[i].type = 3;
+    }
     else
+    {
       ++bottomBlack;
+      arr[i].type = 4;
+    }
   }
   maxRes = getRes(topWhite, topBlack, bottomWhite, bottomBlack, lineLeftWhite + lineLeftBlack + lineRightWhite + lineRightBlack);
+
   // 准备工作结束，开始遍历
   i = i1;
   j = j1 ? j1 + 1 : i2;
   j2 = j2 || n - 1;
-  while (i < n - 1)
+  while (i < i2 && j < j2)
   {
-    // printf("%d %d %lf\n", arr[i].x, arr[i].y, arr[i].angle);
-    if (abs(fmod(preAngle - arr[i].angle + 2 * M_PI, 2 * M_PI) - M_PI) < MIN_DIFF)
-    {
-      // 与之前的角度正好是180度
-      // printf("=== 180\n\n");
-      t = lineLeftWhite;
-      lineLeftWhite = lineRightWhite;
-      lineRightWhite = t;
-      t = lineRightBlack;
-      lineRightBlack = lineLeftBlack;
-      lineLeftBlack = t;
-      t = topWhite;
-      topWhite = bottomWhite;
-      bottomWhite = t;
-      t = topBlack;
-      topBlack = bottomBlack;
-      bottomBlack = t;
-      preAngle = arr[i].angle;
+    topWhite += lineRightWhite;
+    topBlack += lineRightBlack;
+    bottomWhite += lineLeftWhite;
+    bottomBlack += lineLeftBlack;
+    lineRightWhite = 0;
+    lineRightBlack = 0;
+    lineLeftWhite = 0;
+    lineLeftBlack = 0;
 
-      res = getRes(topWhite, topBlack, bottomWhite, bottomBlack, lineLeftWhite + lineLeftBlack + lineRightWhite + lineRightBlack);
-      if (res > maxRes)
-        maxRes = res;
-      if (i > j)
-        break;
-      t = i;
-      i = j;
-      j = t;
-      continue;
-    }
-    else if (fmod(preAngle - arr[i].angle + 2 * M_PI, 2 * M_PI) < M_PI)
+    ai = arr[i].angle;
+    aj = arr[j].angle;
+    if (ai + M_PI < aj)
+      a = ai;
+    else
+      a = aj - M_PI;
+    ii = i;
+    jj = j;
+    while (abs(arr[ii].angle - a) < MIN_DIFF)
     {
-      // 与之前角度小于180度
-      // printf("small 180\n\n");
-      bottomWhite += lineLeftWhite;
-      bottomBlack += lineLeftBlack;
-      topWhite += lineRightWhite;
-      topBlack += lineRightBlack;
-      lineLeftWhite = 0;
-      lineLeftBlack = 0;
-      lineRightWhite = 0;
-      lineRightBlack = 0;
-      ii = getNextIndex(i + 1);
-      // 后面的点处在同一角度
-      while (getEqualAngle(arr[ii].angle, arr[i].angle))
+      if (arr[ii].t)
       {
-        // printf("- %d\n", ii);
-        if (arr[ii].t)
-        {
-          --topWhite;
-          ++lineLeftWhite;
-        }
-        else
-        {
-          --topBlack;
-          ++lineLeftBlack;
-        }
-        ii = getNextIndex(ii + 1);
+        ++lineLeftWhite;
+        --topWhite;
       }
-      jj = getNextIndex(j + 1);
-      // 小于角度的另外一侧
-      while (getState(i, jj))
+      else
       {
-        if (arr[jj].t)
-        {
-          --bottomWhite;
-          ++topWhite;
-        }
-        else
-        {
-          --bottomBlack;
-          ++topBlack;
-        }
-        jj = getNextIndex(jj + 1);
+        ++lineLeftBlack;
+        --topBlack;
       }
-      while (abs(fmod(arr[jj].angle + 3 * M_PI - arr[i].angle, 2 * M_PI)) < MIN_DIFF)
-      {
-        if (arr[jj].t)
-        {
-          --bottomWhite;
-          ++lineRightWhite;
-        }
-        else
-        {
-          --bottomBlack;
-          ++lineRightBlack;
-        }
-        jj = getNextIndex(jj + 1);
-      }
-      preAngle = arr[i].angle;
-      res = getRes(topWhite, topBlack, bottomWhite, bottomBlack, lineLeftWhite + lineLeftBlack + lineRightWhite + lineRightBlack);
-      if (res > maxRes)
-        maxRes = res;
-      if (ii < i)
-        break;
-      i = ii;
-      j = jj;
-      continue;
+      ++ii;
     }
-    else if (fmod(preAngle - arr[i].angle + 2 * M_PI, 2 * M_PI) > M_PI)
+    while (abs(arr[jj].angle - a - M_PI) < MIN_DIFF)
     {
-      // 之前角度大于180度
-      // printf("big 180\n\n");
-      t = topWhite;
-      topWhite = bottomWhite;
-      bottomWhite = t;
-      t = topBlack;
-      topBlack = bottomBlack;
-      bottomBlack = t;
-      topWhite += lineLeftWhite;
-      topBlack += lineLeftBlack;
-      bottomBlack += lineRightBlack;
-      bottomWhite += lineRightWhite;
-
-      lineLeftWhite = 0;
-      lineLeftBlack = 0;
-      lineRightWhite = 0;
-      lineRightBlack = 0;
-      ii = getNextIndex(i + 1);
-      while (getEqualAngle(arr[ii].angle, arr[i].angle))
+      if (arr[jj].t)
       {
-        if (arr[ii].t)
-        {
-          --topWhite;
-          ++lineLeftWhite;
-        }
-        else
-        {
-          --topBlack;
-          ++lineLeftBlack;
-        }
-        ii = getNextIndex(ii + 1);
+        ++lineLeftWhite;
+        --bottomWhite;
       }
-      preAngle = arr[i].angle;
-      res = getRes(topWhite, topBlack, bottomWhite, bottomBlack, lineLeftWhite + lineLeftBlack + lineRightWhite + lineRightBlack);
-      if (res > maxRes)
-        maxRes = res;
-      if (ii < i)
-        break;
-      i = ii;
-      j = (i + (n - 1) + 1) % (n - 1);
-      continue;
+      else
+      {
+        ++lineLeftBlack;
+        --bottomBlack;
+      }
+      ++jj;
     }
-    // printf("none\n\n\n");
-    return 0;
+    i = ii;
+    j = jj;
+    res = getRes(topWhite, topBlack, bottomWhite, bottomBlack, lineLeftWhite + lineLeftBlack + lineRightWhite + lineRightBlack);
+    if (res > maxRes)
+      maxRes = res;
   }
-  // printf("?????%d\n\n\n", maxRes);
+  while (i < i2)
+  {
+    topWhite += lineRightWhite;
+    topBlack += lineRightBlack;
+    bottomWhite += lineLeftWhite;
+    bottomBlack += lineLeftBlack;
+    lineRightWhite = 0;
+    lineRightBlack = 0;
+    lineLeftWhite = 0;
+    lineLeftBlack = 0;
+    ii = i;
+    a = arr[i].angle;
+    while (abs(arr[ii].angle - a) < MIN_DIFF)
+    {
+      if (arr[ii].t)
+      {
+        ++lineLeftWhite;
+        --topWhite;
+      }
+      else
+      {
+        ++lineLeftBlack;
+        --topBlack;
+      }
+      ++ii;
+    }
+    i = ii;
+    res = getRes(topWhite, topBlack, bottomWhite, bottomBlack, lineLeftWhite + lineLeftBlack + lineRightWhite + lineRightBlack);
+    if (res > maxRes)
+      maxRes = res;
+  }
+
+  while (j < j2)
+  {
+    topWhite += lineRightWhite;
+    topBlack += lineRightBlack;
+    bottomWhite += lineLeftWhite;
+    bottomBlack += lineLeftBlack;
+    lineRightWhite = 0;
+    lineRightBlack = 0;
+    lineLeftWhite = 0;
+    lineLeftBlack = 0;
+    jj = j;
+    a = arr[j].angle;
+    while (abs(arr[jj].angle - a) < MIN_DIFF)
+    {
+      if (arr[jj].t)
+      {
+        ++lineLeftWhite;
+        --bottomWhite;
+      }
+      else
+      {
+        ++lineLeftBlack;
+        --bottomBlack;
+      }
+      ++jj;
+    }
+    j = jj;
+    res = getRes(topWhite, topBlack, bottomWhite, bottomBlack, lineLeftWhite + lineLeftBlack + lineRightWhite + lineRightBlack);
+    if (res > maxRes)
+      maxRes = res;
+  }
   return maxRes;
 }
 
