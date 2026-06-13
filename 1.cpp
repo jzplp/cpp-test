@@ -2,7 +2,7 @@
 #include <math.h>
 #include <stdlib.h>
 
-#define MIN_DIFF 10e-8
+#define MIN_DIFF 10e-9
 
 struct Item
 {
@@ -19,7 +19,11 @@ Item arr[1010];
 
 int compare(const void *left, const void *right)
 {
-  return ((const Item *)left)->angle - ((const Item *)right)->angle;
+  if (((const Item *)left)->angle > ((const Item *)right)->angle)
+    return 1;
+  if (((const Item *)left)->angle < ((const Item *)right)->angle)
+    return -1;
+  return 0;
 }
 
 bool getEqualAngle(double angle1, double angle2)
@@ -94,7 +98,7 @@ int computedI()
         ++lineRightWhite;
       else
         ++lineRightBlack;
-      j1 = i;
+      j1 = i + 1;
       continue;
     }
     if (abs(arr[i].angle - 2 * M_PI) < MIN_DIFF)
@@ -119,7 +123,7 @@ int computedI()
 
   // 准备工作结束，开始遍历
   i = i1;
-  j = j1 ? j1 + 1 : i2;
+  j = j1 ? j1 : i2;
   j2 = flag ? j2 : (n - 1);
   while (i < i2 && j < j2)
   {
@@ -131,7 +135,6 @@ int computedI()
     lineRightBlack = 0;
     lineLeftWhite = 0;
     lineLeftBlack = 0;
-
     ai = arr[i].angle;
     aj = arr[j].angle;
     if (ai + M_PI < aj)
@@ -140,7 +143,7 @@ int computedI()
       a = aj - M_PI;
     ii = i;
     jj = j;
-    while (abs(arr[ii].angle - a) < MIN_DIFF)
+    while (abs(arr[ii].angle - a) < MIN_DIFF && ii < i2)
     {
       if (arr[ii].t)
       {
@@ -154,7 +157,7 @@ int computedI()
       }
       ++ii;
     }
-    while (abs(arr[jj].angle - a - M_PI) < MIN_DIFF)
+    while (abs(arr[jj].angle - a - M_PI) < MIN_DIFF && jj < j2)
     {
       if (arr[jj].t)
       {
@@ -186,7 +189,7 @@ int computedI()
     lineLeftBlack = 0;
     ii = i;
     a = arr[i].angle;
-    while (abs(arr[ii].angle - a) < MIN_DIFF)
+    while (abs(arr[ii].angle - a) < MIN_DIFF && ii < i2)
     {
       if (arr[ii].t)
       {
@@ -217,7 +220,7 @@ int computedI()
     lineLeftBlack = 0;
     jj = j;
     a = arr[j].angle;
-    while (abs(arr[jj].angle - a) < MIN_DIFF)
+    while (abs(arr[jj].angle - a) < MIN_DIFF && jj < j2)
     {
       if (arr[jj].t)
       {
