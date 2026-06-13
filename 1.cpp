@@ -23,10 +23,10 @@ int compare(const void *left, const void *right)
   return ((const Item *)left)->angle - ((const Item *)right)->angle;
 }
 
-bool getEqualAngle(double angle1, double angle2) {
+bool getEqualAngle(double angle1, double angle2)
+{
   return abs(fmod(angle1 - angle2 + 2 * M_PI, 2 * M_PI)) < MIN_DIFF;
 }
-
 
 // 预处理，变为以a点做起点
 void preI(int a)
@@ -59,16 +59,23 @@ int getNextIndex(int i)
   return i % (n - 1);
 }
 
-bool getState(int i, int j) {
-  double anglei = arr[i].angle + M_PI, anglej = arr[j].angle;
-  if(getEqualAngle(anglei, anglej)) return false;
-  if(anglei > anglej) {
-    if(anglei - anglej < M_PI) return true;
+bool getState(int i, int j)
+{
+  if(getEqualAngle(arr[i].angle, arr[j].angle)) return false;
+  double anglei = fmod(arr[i].angle + M_PI, 2 * M_PI), anglej = arr[j].angle;
+  // printf("qqq %lf %lf\n", anglei, anglej);
+  if (getEqualAngle(anglei, anglej))
+    return false;
+  if (anglei > anglej)
+  {
+    if (anglei - anglej < M_PI)
+      return true;
     return false;
   }
-  if(anglei + 2 * M_PI - anglej < M_PI) return true;
-  return false; 
-} 
+  if (anglei + 2 * M_PI - anglej < M_PI)
+    return true;
+  return false;
+}
 
 int getRes(int topWhite, int topBlack, int bottomWhite, int bottomBlack, int line)
 {
@@ -84,7 +91,7 @@ int computedI()
   int topWhite = 0, topBlack = 0, bottomWhite = 0, bottomBlack = 0, lineLeftWhite = 0, lineLeftBlack = 0, lineRightWhite = 0, lineRightBlack = 0;
   int maxRes = 0, res;
   // 计算起始个数
-  // 计算0-180度的数量
+  // 计算0-180度的数量（不含180）
   for (i = 0; i < n - 1; ++i)
   {
     if (arr[i].angle < MIN_DIFF)
@@ -105,7 +112,7 @@ int computedI()
 
   i1 = lineLeftWhite + lineLeftBlack;
   i2 = i;
-  // 计算180-360度的数量
+  // 计算180-360度的数量（含180）
   for (; i < n - 1; ++i)
   {
     if (abs(arr[i].angle - M_PI) < MIN_DIFF)
@@ -135,11 +142,15 @@ int computedI()
   maxRes = getRes(topWhite, topBlack, bottomWhite, bottomBlack, lineLeftWhite + lineLeftBlack + lineRightWhite + lineRightBlack);
   // 准备工作结束，开始遍历
   i = i1;
-  j = j1 + 1;
+  j = j1 ? j1 + 1 : i2;
+  j2 = j2 || n - 1;
   while (i < n - 1)
   {
+    // printf("%d %d %lf\n", arr[i].x, arr[i].y, arr[i].angle);
     if (abs(fmod(preAngle - arr[i].angle + 2 * M_PI, 2 * M_PI) - M_PI) < MIN_DIFF)
     {
+      // 与之前的角度正好是180度
+      // printf("=== 180\n\n");
       t = lineLeftWhite;
       lineLeftWhite = lineRightWhite;
       lineRightWhite = t;
@@ -162,9 +173,12 @@ int computedI()
       t = i;
       i = j;
       j = t;
+      continue;
     }
     else if (fmod(preAngle - arr[i].angle + 2 * M_PI, 2 * M_PI) < M_PI)
     {
+      // 与之前角度小于180度
+      // printf("small 180\n\n");
       bottomWhite += lineLeftWhite;
       bottomBlack += lineLeftBlack;
       topWhite += lineRightWhite;
@@ -174,8 +188,10 @@ int computedI()
       lineRightWhite = 0;
       lineRightBlack = 0;
       ii = getNextIndex(i + 1);
+      // 后面的点处在同一角度
       while (getEqualAngle(arr[ii].angle, arr[i].angle))
       {
+        // printf("- %d\n", ii);
         if (arr[ii].t)
         {
           --topWhite;
@@ -189,6 +205,7 @@ int computedI()
         ii = getNextIndex(ii + 1);
       }
       jj = getNextIndex(j + 1);
+      // 小于角度的另外一侧
       while (getState(i, jj))
       {
         if (arr[jj].t)
@@ -225,9 +242,12 @@ int computedI()
         break;
       i = ii;
       j = jj;
+      continue;
     }
     else if (fmod(preAngle - arr[i].angle + 2 * M_PI, 2 * M_PI) > M_PI)
     {
+      // 之前角度大于180度
+      // printf("big 180\n\n");
       t = topWhite;
       topWhite = bottomWhite;
       bottomWhite = t;
@@ -266,8 +286,12 @@ int computedI()
         break;
       i = ii;
       j = (i + (n - 1) + 1) % (n - 1);
+      continue;
     }
+    // printf("none\n\n\n");
+    return 0;
   }
+  // printf("?????%d\n\n\n", maxRes);
   return maxRes;
 }
 
