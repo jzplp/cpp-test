@@ -58,7 +58,8 @@ int getRes(int topWhite, int topBlack, int bottomWhite, int bottomBlack, int lin
 // 计算
 int computedI()
 {
-  int i, j, i1, i2, j1, j2 = 0, ii, jj;
+  int i, j, i1 = 0, i2 = 0, j1 = 0, j2 = 0, ii, jj;
+  bool flag = false;
   double ai, aj, a;
   int topWhite = 0, topBlack = 0, bottomWhite = 0, bottomBlack = 0, lineLeftWhite = 0, lineLeftBlack = 0, lineRightWhite = 0, lineRightBlack = 0;
   int maxRes = 0, res;
@@ -98,8 +99,11 @@ int computedI()
     }
     if (abs(arr[i].angle - 2 * M_PI) < MIN_DIFF)
     {
-      if (!j2)
-        j2 = j;
+      if (!flag)
+      {
+        j2 = i;
+        flag = true;
+      }
       if (arr[i].t)
         ++lineLeftWhite;
       else
@@ -116,7 +120,7 @@ int computedI()
   // 准备工作结束，开始遍历
   i = i1;
   j = j1 ? j1 + 1 : i2;
-  j2 = j2 || n - 1;
+  j2 = flag ? j2 : (n - 1);
   while (i < i2 && j < j2)
   {
     topWhite += lineRightWhite;
@@ -154,12 +158,12 @@ int computedI()
     {
       if (arr[jj].t)
       {
-        ++lineLeftWhite;
+        ++lineRightWhite;
         --bottomWhite;
       }
       else
       {
-        ++lineLeftBlack;
+        ++lineRightBlack;
         --bottomBlack;
       }
       ++jj;
@@ -217,12 +221,12 @@ int computedI()
     {
       if (arr[jj].t)
       {
-        ++lineLeftWhite;
+        ++lineRightWhite;
         --bottomWhite;
       }
       else
       {
-        ++lineLeftBlack;
+        ++lineRightBlack;
         --bottomBlack;
       }
       ++jj;
