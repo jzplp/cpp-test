@@ -87,7 +87,7 @@ int computedI()
   // 计算0-180度的数量
   for (i = 0; i < n - 1; ++i)
   {
-    if (arr[i].angle < MIN_DIFF)
+    if (abs(arr[i].angle) < MIN_DIFF)
     {
       if (arr[i].t)
         ++lineLeftWhite;
@@ -103,7 +103,7 @@ int computedI()
       ++topBlack;
   }
 
-  i1 = lineLeftWhite + lineLeftBlack;
+  i1 = lineLeftWhite + lineLeftBlack + 1;
   i2 = i;
   // 计算180-360度的数量
   for (; i < n - 1; ++i)
