@@ -1,42 +1,71 @@
 #include <stdio.h>
-#include <set>
+#include <string.h>
 
-using namespace std;
+#define MAXN 200005
 
-int arr[1000005];
+int arr[MAXN];
 int n;
-set<int> se;
+int leftArr[MAXN], rightArr[MAXN];
+
+void computed()
+{
+  int i, left;
+  memset(leftArr, 0, sizeof(leftArr));
+  memset(rightArr, 0, sizeof(rightArr));
+  leftArr[0] = 1;
+  left = 0;
+  for (i = 1; i < n; ++i)
+  {
+    if (arr[i] > arr[i - 1])
+    {
+      ++leftArr[left];
+      if (i == n - 1)
+        rightArr[i] = leftArr[left];
+    }
+    else
+    {
+      rightArr[i - 1] = leftArr[left];
+      left = i;
+      leftArr[i] = 1;
+      if (i == n - 1)
+        rightArr[i] = 1;
+    }
+  }
+  for (i = 1; i < n; ++i)
+  {
+    if (leftArr[i])
+      continue;
+    leftArr[i] = leftArr[i - 1] - 1;
+  }
+  for (i = n - 1; i >= 0; --i)
+  {
+    if (rightArr[i])
+      continue;
+    rightArr[i] = rightArr[i + 1] - 1;
+  }
+
+  // output
+  for (i = 0; i < n; ++i)
+    printf("%2d ", arr[i]);
+  putchar('\n');
+  for (i = 0; i < n; ++i)
+    printf("%2d ", leftArr[i]);
+  putchar('\n');
+  for (i = 0; i < n; ++i)
+    printf("%2d ", rightArr[i]);
+  putchar('\n');
+}
 
 int main()
 {
   int t, i;
-  int l, r;
-  int len, mexLen;
   scanf("%d", &t);
   while (t--)
   {
     scanf("%d", &n);
     for (i = 0; i < n; ++i)
       scanf("%d", &arr[i]);
-    l = 0;
-    r = 0;
-    se.clear();
-    mexLen = 0;
-    while (r < n)
-    {
-      while (r < n && !se.count(arr[r]))
-      {
-        se.insert(arr[r]);
-        ++r;
-      }
-      len = r - l;
-      if (mexLen < len)
-        mexLen = len;
-      se.erase(arr[l]);
-      ++l;
-    }
-    printf("%d\n", mexLen);
+    computed();
   }
-
   return 0;
 }
