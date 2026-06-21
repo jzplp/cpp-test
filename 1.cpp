@@ -1,5 +1,8 @@
 #include <stdio.h>
 #include <string.h>
+#include <set>
+
+using namespace std;
 
 #define MAXN 200005
 
@@ -7,8 +10,21 @@ int arr[MAXN];
 int n;
 int leftArr[MAXN], rightArr[MAXN];
 
-void computed()
+struct Stu {
+  int i;
+  int value;
+};
+
+bool operator<(const Stu &left, const Stu right) {
+  if(arr[left.i] != arr[right.i]) return left.i < right.i;
+  return left.value < right.value;
+}
+
+set<Stu> se;
+
+void init()
 {
+  se.clear();
   int i, left;
   memset(leftArr, 0, sizeof(leftArr));
   memset(rightArr, 0, sizeof(rightArr));
@@ -56,6 +72,16 @@ void computed()
   putchar('\n');
 }
 
+int computed() {
+  int i, j,k;
+  int value, maxValue = leftArr[0];
+  se.insert({0, });
+  for(i = 1; i < n; ++i) {
+
+  }
+}
+
+
 int main()
 {
   int t, i;
@@ -65,6 +91,7 @@ int main()
     scanf("%d", &n);
     for (i = 0; i < n; ++i)
       scanf("%d", &arr[i]);
+    init();
     computed();
   }
   return 0;
