@@ -8,15 +8,20 @@ using namespace std;
 
 int arr[MAXN];
 int n;
+// leftArr是以i开头的连续子序列长度
+// rightArr是以i结尾的连续子序列长度
 int leftArr[MAXN], rightArr[MAXN];
 
-struct Stu {
-  int i;
+struct Stu
+{
+  int arrV;
   int value;
 };
 
-bool operator<(const Stu &left, const Stu right) {
-  if(arr[left.i] != arr[right.i]) return left.i < right.i;
+bool operator<(const Stu &left, const Stu right)
+{
+  if (left.arrV != right.arrV)
+    return left.arrV < right.arrV;
   return left.value < right.value;
 }
 
@@ -61,6 +66,7 @@ void init()
   }
 
   // output
+  /*
   for (i = 0; i < n; ++i)
     printf("%2d ", arr[i]);
   putchar('\n');
@@ -70,17 +76,54 @@ void init()
   for (i = 0; i < n; ++i)
     printf("%2d ", rightArr[i]);
   putchar('\n');
+  */
 }
 
-int computed() {
-  int i, j,k;
+int computed()
+{
+  int i, j, k;
   int value, maxValue = leftArr[0];
-  se.insert({0, });
-  for(i = 1; i < n; ++i) {
-
+  for (i = 1; i < n; ++i)
+  {
+    Stu item = {arr[i - 1], leftArr[i - 1]};
+    se.insert(item);
+    auto ip = se.find(item);
+    if (ip != se.begin())
+    {
+      ip--;
+      // 如果前一个元素的值大于当前元素，那么当前值没有插入的必要
+      if (ip->value >= item.value)
+      {
+        se.erase(item);
+        continue;
+      }
+      // arr[i]的值相等，且当前值value更大，则前一个值没有存在的必要
+      if (ip->arrV == item.arrV)
+      {
+        se.erase(ip);
+      }
+      // 向后删除value值更小，没有存在必要的元素
+      ip = se.find(item);
+      while (ip != se.end())
+      {
+        if (ip->value)
+        {
+          se.erase(ip++);
+        }
+        break;
+      }
+    }
+    // 对于rightArr[i], 从set中找最合适的元素
+    ip = se.lower_bound({arr[i], 0});
+    if (ip == se.begin())
+      continue;
+    --ip;
+    value = rightArr[i] + ip->value;
+    if (value > maxValue)
+      maxValue = value;
   }
+  return maxValue;
 }
-
 
 int main()
 {
@@ -92,7 +135,7 @@ int main()
     for (i = 0; i < n; ++i)
       scanf("%d", &arr[i]);
     init();
-    computed();
+    printf("%d\n", computed());
   }
   return 0;
 }
