@@ -82,12 +82,14 @@ void init()
 int computed()
 {
   int i, j, k;
+  bool flag;
   int value, maxValue = leftArr[0];
   for (i = 1; i < n; ++i)
   {
-    Stu item = {arr[i - 1], leftArr[i - 1]};
+    Stu item = {arr[i - 1], rightArr[i - 1]};
     se.insert(item);
     auto ip = se.find(item);
+    flag = false;
     if (ip != se.begin())
     {
       ip--;
@@ -95,30 +97,33 @@ int computed()
       if (ip->value >= item.value)
       {
         se.erase(item);
-        continue;
+        flag = true;
       }
-      // arr[i]的值相等，且当前值value更大，则前一个值没有存在的必要
-      if (ip->arrV == item.arrV)
-      {
+      else if (ip->arrV == item.arrV) // arr[i]的值相等，且当前值value更大，则前一个值没有存在的必要
         se.erase(ip);
-      }
+    }
+    if (!flag)
+    {
       // 向后删除value值更小，没有存在必要的元素
       ip = se.find(item);
+      ++ip;
       while (ip != se.end())
       {
-        if (ip->value)
-        {
+        if (ip->value <= item.value)
           se.erase(ip++);
-        }
-        break;
+        else
+          break;
       }
     }
     // 对于rightArr[i], 从set中找最合适的元素
     ip = se.lower_bound({arr[i], 0});
     if (ip == se.begin())
-      continue;
-    --ip;
-    value = rightArr[i] + ip->value;
+      value = ip->value;
+    else
+    {
+      --ip;
+      value = leftArr[i] + ip->value;
+    }
     if (value > maxValue)
       maxValue = value;
   }
