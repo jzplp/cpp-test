@@ -1,9 +1,17 @@
 #include <stdio.h>
+#include <stack>
 #define MAXN 1000005
+using namespace std;
 
 int n, l;
 int arr[MAXN];
 int sumArr[MAXN];
+
+struct Res
+{
+  int start, end;
+  double value;
+};
 
 void init()
 {
@@ -14,6 +22,16 @@ void init()
   for (i = 0; i < n; ++i)
     printf("%d ", sumArr[i]);
   putchar('\n');
+}
+
+Res computed()
+{
+  int i, j, k;
+  Res resMax = {0, l, 0}, res;
+  stack<int> st;
+  for (i = l; i < n; ++i)
+  {
+  }
 }
 
 int main()
