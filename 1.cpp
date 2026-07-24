@@ -38,11 +38,10 @@ Res computed()
   double a, b = 0;
   Res resMax = {0, l - 1, (double)sumArr[l - 1] / l}, res;
   i1 = 0; // 当前切点位置 是stack的位置
-  stack[0] = 0;
-  stlen = 1;
+  stlen = 0;
   for (i = l; i < n; ++i)
   {
-    j = i - l + 1;
+    j = i - l;
     stack[stlen++] = j;
     while (stlen > 2)
     {
@@ -57,28 +56,24 @@ Res computed()
       else
         break;
     }
-    if (i1 >= stlen - 1)
-      i1 = stlen - 1;
+    if (stlen > 2 && i1 > stlen - 2)
+      i1 = stlen - 2;
     b = 0;
     while (i1 < stlen)
     {
       a = (double)(sumArr[i] - sumArr[stack[i1]]) / (i - stack[i1]);
+      // printf("%d %d %lf\n", i1, i, a);
       if (a < b)
-      {
-        if (resMax.value < b)
-          resMax = {stack[i1 - 1], i, b};
-        i1--;
         break;
-      }
       b = a;
       ++i1;
     }
-    if (i1 == stlen)
-    {
-      if (resMax.value < b)
-        resMax = {stack[i1 - 1], i, b};
-      i1--;
-    }
+    i1--;
+    // printf("%d %d %d %lf %lf %lf\n", stack[i1], i, sumArr[i], resMax.value, b, (double)sumArr[i] / i);
+    if (resMax.value < b)
+      resMax = {stack[i1] + 1, i, b};
+    if (resMax.value < (double)sumArr[i] / (i + 1))
+      resMax = {0, i, (double)sumArr[i] / (i + 1)};
   }
   return resMax;
 }
