@@ -1,96 +1,97 @@
 #include <stdio.h>
 #include <string.h>
-#define MAXN 1000005
+#define MAXN 505
 
-int n, l;
 int arr[MAXN];
-int sumArr[MAXN];
+int arrV[MAXN];
+int m, k;
+long long sum, max;
 
-int stack[MAXN];
-int stlen = 0;
-
-struct Res
+bool getSum(long long v)
 {
-  int start, end;
-  double value;
-};
-
-void init()
-{
+  int ki = k;
   int i, j;
-  sumArr[0] = arr[0];
-  for (i = 0; i < n; ++i)
-    sumArr[i] = sumArr[i - 1] + arr[i];
-  memset(stack, 0, sizeof(stack));
-  /*
-  for (i = 0; i < n; ++i)
-    printf("%d ", sumArr[i]);
-  putchar('\n');
-  */
+  long long sumt = 0;
+  for (i = 0; i < m; ++i)
+  {
+    sumt += arr[i];
+    if (sumt > v)
+    {
+      --ki;
+      sumt = arr[i];
+    }
+    if (ki <= 0)
+      return false;
+  }
+  return true;
 }
 
-Res computed()
+long long computed(int beg, int end)
 {
-  int i, j, k;
-  int i1, j1, j2, j3;
-  double a, b = 0;
-  Res resMax = {0, l - 1, (double)sumArr[l - 1] / l}, res;
-  i1 = 0; // 当前切点位置 是stack的位置
-  stlen = 0;
-  for (i = l; i < n; ++i)
+  long long mid = (beg + end) / 2;
+  if (mid == beg)
   {
-    j = i - l;
-    stack[stlen++] = j;
-    while (stlen > 2)
-    {
-      j1 = stack[stlen - 1];
-      j2 = stack[stlen - 2];
-      j3 = stack[stlen - 3];
-      if ((double)(sumArr[j2] - sumArr[j3]) / (j2 - j3) > (double)(sumArr[j1] - sumArr[j3]) / (j1 - j3))
-      {
-        stack[stlen - 2] = stack[stlen - 1];
-        --stlen;
-      }
-      else
-        break;
-    }
-    if (stlen >= 2 && i1 > stlen - 2)
-      i1 = stlen - 2;
-    b = 0;
-    while (i1 < stlen)
-    {
-      a = (double)(sumArr[i] - sumArr[stack[i1]]) / (i - stack[i1]);
-      if (a < b)
-        break;
-      b = a;
-      ++i1;
-    }
-    i1--;
-    if (resMax.value < b)
-      resMax = {stack[i1] + 1, i, b};
-    if (resMax.value < (double)sumArr[i] / (i + 1))
-      resMax = {0, i, (double)sumArr[i] / (i + 1)};
+    if (getSum(mid))
+      return mid;
+    return end;
   }
-  return resMax;
+  if (getSum(mid))
+    end = mid;
+  else
+    beg = mid;
+  return computed(beg, end);
+}
+
+void getPrint(long long v)
+{
+  int i, j, ki = k;
+  long long sumt = 0;
+  for (i = m - 1; i >= 0; --i)
+  {
+    if (i + 1 == ki)
+    {
+      arrV[i] = ki--;
+      continue;
+    }
+    sumt += arr[i];
+    arrV[i] = ki;
+    if (sumt > v)
+    {
+      --ki;
+      sumt = arr[i];
+      arrV[i] = ki;
+    }
+  }
 }
 
 int main()
 {
-  int t, i, j, k;
-  char c;
-  scanf("%d", &t);
-  while (t--)
+  int i, j, N;
+  long long v;
+  scanf("%d", &N);
+  while (N--)
   {
-    scanf("%d %d", &n, &l);
-    getchar();
-    for (i = 0; i < n; ++i)
+    sum = 0;
+    max = 0;
+    scanf("%d %d", &m, &k);
+    for (i = 0; i < m; ++i)
     {
-      scanf("%c", &c);
-      arr[i] = c - '0';
+      scanf("%d", &arr[i]);
+      sum += arr[i];
+      if (arr[i] > max)
+        max = arr[i];
     }
-    init();
-    Res res = computed();
-    printf("%d %d\n", res.start + 1, res.end + 1);
+    v = computed(max, sum);
+    getPrint(v);
+    for (i = 0; i < m; ++i)
+    {
+      printf("%d", arr[i]);
+      if(i + 1 != m) {
+        printf(" ");
+        if(arrV[i + 1] != arrV[i]) printf("/ ");
+      }
+    }
+    putchar('\n');
   }
   return 0;
 }
