@@ -1,8 +1,6 @@
 #include <stdio.h>
 #include <string.h>
-// #include <stack>
 #define MAXN 1000005
-// using namespace std;
 
 int n, l;
 int arr[MAXN];
@@ -56,20 +54,18 @@ Res computed()
       else
         break;
     }
-    if (stlen > 2 && i1 > stlen - 2)
+    if (stlen >= 2 && i1 > stlen - 2)
       i1 = stlen - 2;
     b = 0;
     while (i1 < stlen)
     {
       a = (double)(sumArr[i] - sumArr[stack[i1]]) / (i - stack[i1]);
-      // printf("%d %d %lf\n", i1, i, a);
       if (a < b)
         break;
       b = a;
       ++i1;
     }
     i1--;
-    // printf("%d %d %d %lf %lf %lf\n", stack[i1], i, sumArr[i], resMax.value, b, (double)sumArr[i] / i);
     if (resMax.value < b)
       resMax = {stack[i1] + 1, i, b};
     if (resMax.value < (double)sumArr[i] / (i + 1))
