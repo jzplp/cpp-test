@@ -26,7 +26,7 @@ bool getSum(long long v)
   return true;
 }
 
-long long computed(int beg, int end)
+long long computed(long long beg, long long end)
 {
   long long mid = (beg + end) / 2;
   if (mid == beg)
@@ -44,13 +44,21 @@ long long computed(int beg, int end)
 
 void getPrint(long long v)
 {
-  int i, j, ki = k;
+  int i, j, ki = k - 1;
   long long sumt = 0;
   for (i = m - 1; i >= 0; --i)
   {
-    if (i + 1 == ki)
+    if (i <= ki)
     {
+      if (sumt + arr[i] > v)
+      {
+        --ki;
+        arrV[i] = ki;
+        sumt = arr[i];
+        continue;
+      }
       arrV[i] = ki--;
+      sumt = 0;
       continue;
     }
     sumt += arr[i];
@@ -86,9 +94,11 @@ int main()
     for (i = 0; i < m; ++i)
     {
       printf("%d", arr[i]);
-      if(i + 1 != m) {
+      if (i + 1 != m)
+      {
         printf(" ");
-        if(arrV[i + 1] != arrV[i]) printf("/ ");
+        if (arrV[i + 1] != arrV[i])
+          printf("/ ");
       }
     }
     putchar('\n');
