@@ -1,40 +1,33 @@
 #include <stdio.h>
-#include <queue>
-#include <vector>
-#define MAXN 5002
-using namespace std;
+#include <math.h>
 
-int n;
-int arr[MAXN];
-
-bool cmp(int left, int right)
+long long func(int k)
 {
-  return left > right;
+  if (k == 0)
+    return 1;
+  return (long long)(pow(3, k));
+}
+
+long long fun(int k, int i)
+{
+  if (i == 0)
+    return 0;
+  if (k == 0)
+    return 1;
+  int half = 1 << (k - 1);
+  if (i <= half)
+    return 2 * fun(k - 1, i);
+  return 2 * func(k - 1) + fun(k - 1, i - half);
 }
 
 int main()
 {
-  int i, j, a1, a2, sum;
-  while (scanf("%d", &n) > 0 && n != 0)
+  int t, ti, k, a, b;
+  scanf("%d", &t);
+  ti = 0;
+  while (t--)
   {
-    priority_queue<int, vector<int>, bool (*)(int, int)> qu(cmp);
-    for (i = 0; i < n; ++i)
-    {
-      scanf("%d", &j);
-      qu.push(j);
-    }
-    sum = 0;
-    while (qu.size() != 1)
-    {
-      a1 = qu.top();
-      qu.pop();
-      a2 = qu.top();
-      qu.pop();
-      a1 += a2;
-      sum += a1;
-      qu.push(a1);
-    }
-    printf("%d\n", sum);
+    scanf("%d %d %d", &k, &a, &b);
+    printf("Case %d: %lld\n", ++ti, fun(k, b) - fun(k, a - 1));
   }
-  return 0;
 }
