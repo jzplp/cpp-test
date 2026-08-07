@@ -1,4 +1,2 @@
-Case 1: 1
-Case 2: 27
-Case 3: 14
-Case 4: 205891132094649
+Case 1: Not possible
+Case 2: Possible from station 4
