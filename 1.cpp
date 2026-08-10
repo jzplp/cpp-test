@@ -6,7 +6,7 @@
 int arrInput[2 * MAXM]; // 所有门的入口
 int n, m;
 int arrm[MAXM];
-int arrn[MAXN];  // 入口值列表
+int arrnOnei;    // 入口值开始变为1的编号
 int outM;        // 出口门编号
 int zeroV, oneV; // 全0和全1时的值
 
@@ -29,7 +29,11 @@ void init()
 int getDeepValue(int i)
 {
   if (i < 0)
-    return arrn[-i];
+  {
+    if (-i <= arrnOnei)
+      return 1;
+    return 0;
+  }
   if (getDeepValue(arrInput[2 * i]) && getDeepValue(arrInput[2 * i - 1]))
     return 0;
   return 1;
@@ -39,27 +43,22 @@ void getInitValue()
 {
   int i, j, k;
   // 计算入口值全0
-  memset(arrn, 0, sizeof(arrn));
+  arrnOnei = 0;
   zeroV = getDeepValue(outM);
-  for (i = 1; i <= n; ++i)
-    arrn[i] = 1;
+  arrnOnei = n+1;
   oneV = getDeepValue(outM);
 }
 
 int computed(int beg, int end)
 {
   int mid = (beg + end) / 2;
-  if (beg == mid)
+  // printf("--- %d %d %d\n", beg, mid, end);
+  if (beg >= mid || beg == end)
     return end;
-  int i, v;
-  for (i = 1; i <= n; ++i)
-  {
-    if (i <= mid)
-      arrn[i] = 1;
-    else
-      arrn[i] = 0;
-  }
+  int v;
+  arrnOnei = mid;
   v = getDeepValue(outM);
+  // printf("--- %d\n", v);
   if (v == zeroV)
     beg = mid;
   else
@@ -77,9 +76,9 @@ int main()
     for (i = 1; i <= 2 * m; ++i)
       scanf("%d", &arrInput[i]);
     init();
-    printf("%d\n", outM);
+    // printf("%d\n", outM);
     getInitValue();
-    printf("%d %d \n", zeroV, oneV);
+     // printf("%d %d \n", zeroV, oneV);
     if (zeroV == oneV)
     {
       for (i = 1; i <= n; ++i)
@@ -87,7 +86,8 @@ int main()
       putchar('\n');
       continue;
     }
-    j = computed(0, n);
+    j = computed(0, n+1);
+    // printf("%d\n", j);
     for (i = 1; i <= n; ++i)
     {
       if (i < j)
