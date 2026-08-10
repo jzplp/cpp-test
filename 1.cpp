@@ -1,110 +1,70 @@
 #include <stdio.h>
 #include <string.h>
 #define MAXN 100005
-#define MAXM 200005
 
-int arrInput[2 * MAXM]; // 所有门的入口
-int n, m;
-int arrm[MAXM];  // 缓存计算过的门值
-int arrnOnei;    // 入口值开始变为1的编号
-int outM;        // 出口门编号
-int zeroV, oneV; // 全0和全1时的值
+int arrn[MAXN];
+int s, n;
+int arrs[MAXN];
+int steps[MAXN];
 
-void clearArrm()
+void computed()
 {
-  for (int i = 1; i <= m; ++i)
-    arrm[i] = -1;
-}
-
-void init()
-{
-  int i;
-  // 找到出口元素
-  memset(arrm, 0, sizeof(arrm));
-  for (i = 1; i <= 2 * m; ++i)
-    if (arrInput[i] > 0)
-      arrm[arrInput[i]] = 1;
-  for (i = 1; i <= m; ++i)
+  int wnum, step;
+  int i, j, k;
+  int num2 = 0;
+  for (wnum = 0;; ++wnum)
   {
-    if (arrm[i] == 0)
-      break;
+    memset(arrs, 0, sizeof(arrs));
+    memset(steps, 0, sizeof(steps));
+    // 计算初始值
+    num2 = 0;
+    for (i = (wnum - 2) * s + 1; i <= (wnum - 1) * s; ++i)
+    {
+      if (i < 0)
+        continue;
+      if (i >= n)
+        return;
+      arrs[arrn[i]] += 1;
+      if (arrs[arrn[i]] == 2)
+        ++num2;
+    }
+    for (step = 1; step <= s; ++step)
+    {
+      i = step + (wnum - 1) * s;
+      if (i - 1 >= n)
+        return;
+      // 减去前一个，增加下一个
+      if (arrs[arrn[i - 1]] == 2)
+        --num2;
+      if (i + s - 1 < n)
+      {
+        ++arrs[arrn[i + s - 1]];
+        if (arrs[arrn[i + s - 1]] == 2)
+          ++num2;
+      }
+      if (num2 > 0)
+        steps[step] = 1;
+    }
   }
-  outM = i;
-}
-
-int getDeepValue(int i)
-{
-  if (i <= 0)
-  {
-    if (-i <= arrnOnei)
-      return 1;
-    return 0;
-  }
-  if (arrm[i] >= 0)
-    return arrm[i];
-  if (getDeepValue(arrInput[2 * i]) && getDeepValue(arrInput[2 * i - 1]))
-  {
-    arrm[i] = 0;
-    return 0;
-  }
-  arrm[i] = 1;
-  return 1;
-}
-
-void getInitValue()
-{
-  // 计算入口值全0
-  arrnOnei = 0;
-  clearArrm();
-  zeroV = getDeepValue(outM);
-  arrnOnei = n + 1;
-  clearArrm();
-  oneV = getDeepValue(outM);
-}
-
-int computed(int beg, int end)
-{
-  int mid = (beg + end) / 2;
-  if (beg >= mid || beg == end)
-    return end;
-  arrnOnei = mid;
-  clearArrm();
-  if (getDeepValue(outM) == zeroV)
-    beg = mid;
-  else
-    end = mid;
-  return computed(beg, end);
 }
 
 int main()
 {
-  int d, i, j;
-  scanf("%d", &d);
-  while (d--)
+  int t, i, j;
+  scanf("%d", &t);
+  while (t--)
   {
-    scanf("%d %d", &n, &m);
-    for (i = 1; i <= 2 * m; ++i)
-      scanf("%d", &arrInput[i]);
-    init();
-    getInitValue();
-    if (zeroV == oneV)
+    scanf("%d %d", &s, &n);
+    for (i = 0; i < n; ++i)
+      scanf("%d", &arrn[i]);
+    computed();
+    j = 0;
+    for (i = 1; i <= s; ++i)
     {
-      for (i = 1; i <= n; ++i)
-        printf("0");
-      putchar('\n');
-      continue;
+      if (steps[i] == 0)
+        ++j;
     }
-    j = computed(0, n + 1);
-    for (i = 1; i <= n; ++i)
-    {
-      if (i < j)
-        printf("1");
-      else if (i > j)
-        printf("0");
-      else
-        printf("x");
-    }
-    putchar('\n');
+    printf("%d\n", j);
   }
   return 0;
 }
