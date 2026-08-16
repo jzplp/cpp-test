@@ -4,7 +4,8 @@
 using namespace std;
 
 int arr[MAXN];
-int last[MAXN];
+int prevArr[MAXN];
+int nextArr[MAXN];
 int n;
 map<int, int> mp;
 
@@ -15,13 +16,20 @@ void init()
   for (i = 1; i <= n; ++i)
   {
     if (!mp[arr[i]])
-      last[i] = 0;
+      prevArr[i] = 0;
     else
-      last[i] = mp[arr[i]];
+      prevArr[i] = mp[arr[i]];
     mp[arr[i]] = i;
-    // printf("%d ", last[i]);
   }
-  // putchar('\n');
+  mp.clear();
+  for (i = n; i >= 1; --i)
+  {
+    if (!mp[arr[i]])
+      nextArr[i] = n + 10;
+    else
+      nextArr[i] = mp[arr[i]];
+    mp[arr[i]] = i;
+  }
 }
 
 bool computed(int beg, int end)
@@ -29,19 +37,13 @@ bool computed(int beg, int end)
   if (beg >= end)
     return true;
   int i;
-  mp.clear();
-  for (i = end; i >= beg; --i)
+  for (i = beg; i <= end; ++i)
   {
-    // printf("%d %d %d\n", i, arr[i], mp[arr[i]]);
-    if (mp[arr[i]])
-      continue;
-    // printf("%d %d %d\n", i, arr[i], mp[arr[i]]);
-    mp[arr[i]] = 1;
-    if (last[i] < beg)
+    if (prevArr[i] < beg && nextArr[i] > end)
       break;
   }
   // printf("-- %d %d %d\n", beg, end, i);
-  if (i < beg)
+  if (i > end)
     return false;
   return computed(beg, i - 1) && computed(i + 1, end);
 }
