@@ -36,16 +36,15 @@ bool computed(int beg, int end)
 {
   if (beg >= end)
     return true;
-  int i;
-  for (i = beg; i <= end; ++i)
+  int i, endi = (end - beg) / 2 + 1;
+  for (i = 0; i <= endi; ++i)
   {
-    if (prevArr[i] < beg && nextArr[i] > end)
-      break;
+    if (prevArr[beg + i] < beg && nextArr[beg + i] > end)
+      return computed(beg, beg + i - 1) && computed(beg + i + 1, end);
+    if (prevArr[end - i] < beg && nextArr[end - i] > end)
+      return computed(beg, end - i - 1) && computed(end - i + 1, end);
   }
-  // printf("-- %d %d %d\n", beg, end, i);
-  if (i > end)
-    return false;
-  return computed(beg, i - 1) && computed(i + 1, end);
+  return false;
 }
 
 int main()
