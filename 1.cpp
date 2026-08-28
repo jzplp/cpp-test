@@ -1,5 +1,5 @@
 #include <stdio.h>
-#define MAXN 1030
+#define MAXN 1031
 
 int group[MAXN][MAXN];
 int n;
