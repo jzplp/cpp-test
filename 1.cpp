@@ -1,29 +1,18 @@
 #include <stdio.h>
 #include <string.h>
+#include <list>
 #define MAXN 1030
+
+using namespace std;
 
 int group[MAXN][MAXN];
 int used[MAXN];
 int usedt[MAXN];
 int n;
+list<int> lst;
+
 int history[MAXN * MAXN][2];
 int hisn;
-
-void print()
-{
-  int i;
-  printf("used\n");
-  for (i = 1; i <= n; ++i)
-  {
-    printf("%d ", used[i]);
-  }
-  printf("\n usedt\n");
-  for (i = 1; i <= n; ++i)
-  {
-    printf("%d ", usedt[i]);
-  }
-  putchar('\n');
-}
 
 bool judge()
 {
@@ -34,67 +23,99 @@ bool judge()
   return true;
 }
 
-void beat(int i, int j)
+void beat(list<int>::iterator &it, list<int>::iterator &it2)
 {
-  if (group[i][j])
-    used[j] = 1;
+  if (group[*it][*it2])
+    used[*it2] = 1;
   else
-    used[i] = 1;
-  usedt[i] = 1;
-  usedt[j] = 1;
-  history[hisn][0] = i;
-  history[hisn][1] = j;
+    used[*it] = 1;
+  history[hisn][0] = *it;
+  history[hisn][1] = *it2;
   ++hisn;
+  it = lst.erase(it);
+  // 避免删除it2后，it也不存在了
+  if(it == it2) {
+    it2 = lst.erase(it2);
+    it = it2;
+  } else {
+    it2 = lst.erase(it2);
+  }
 }
 
 void computed()
 {
-  int i, j, k;
+  list<int>::iterator it3;
+  bool flag;
   // 第一步消灭所有直接消灭的黑色
-  for (i = 2; i <= n; ++i)
+  for (auto it = lst.begin(); it != lst.end();)
   {
-    if (used[i] || usedt[i] || group[1][i])
-      continue;
-    for (j = 2; j <= n; ++j)
+    if (group[1][*it])
     {
-      if (used[j] || usedt[j] || group[i][j] || i == j)
+      ++it;
+      continue;
+    }
+    flag = false;
+    for (auto it2 = lst.begin(); it2 != lst.end();)
+    {
+      if (group[*it][*it2] || it == it2)
+      {
+        ++it2;
         continue;
-      beat(i, j);
+      }
+      beat(it, it2);
+      flag = true;
       break;
     }
+    if (!flag)
+      ++it;
   }
+
   // 第二步 1和另一个
-  for (i = 2; i <= n; ++i)
+  for (auto it = lst.begin(); it != lst.end();)
   {
-    if (used[i] || usedt[i] || !group[1][i])
+    if (!group[1][*it])
+    {
+      ++it;
       continue;
-    beat(1, i);
+    }
+    used[*it] = 1;
+    history[hisn][0] = 1;
+    history[hisn][1] = *it;
+    ++hisn;
+    it = lst.erase(it);
     break;
   }
+
   // 第三步 黑黑对决
-  for (i = 2; i <= n; ++i)
+  for (auto it = lst.begin(); it != lst.end();)
   {
-    if (used[i] || usedt[i] || group[1][i])
-      continue;
-    for (j = i + 1; j <= n; ++j)
+    if (group[1][*it])
     {
-      if (used[j] || usedt[j] || group[1][j])
+      ++it;
+      continue;
+    }
+    flag = false;
+    for (auto it2 = it; it2 != lst.end();)
+    {
+      if (group[1][*it2] || it == it2)
+      {
+        ++it2;
         continue;
-      beat(i, j);
+      }
+      beat(it, it2);
       break;
     }
+    if (!flag)
+      ++it;
   }
+
   // 第四步 剩下混战
-  for (i = 2; i <= n; ++i)
+  for (auto it = lst.begin(); it != lst.end();)
   {
-    if (used[i] || usedt[i])
-      continue;
-    for (j = i + 1; j <= n; ++j)
+    it3 = it;
+    if (++it != lst.end())
     {
-      if (used[j] || usedt[j])
-        continue;
-      beat(i, j);
-      break;
+      beat(it3, it);
     }
   }
 }
@@ -119,7 +140,10 @@ int main()
     hisn = 0;
     while (1)
     {
-      memset(usedt, 0, sizeof(usedt));
+      lst.clear();
+      for (i = 2; i <= n; ++i)
+        if (!used[i])
+          lst.push_back(i);
       computed();
       if (judge())
         break;
