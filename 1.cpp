@@ -12,17 +12,51 @@ void computedFront()
   arrValue[0] = arrCeiling[0];
   for (i = 1; i < n; ++i)
   {
-    if (arrFloor[i] >= arrValue[i - 1])
-    {
-      arrValue[i] = arrFloor[i];
-      continue;
-    }
-    if (arrCeiling[i] <= arrValue[i - 1])
+    if (arrCeiling[i] <= arrFloor[i - 1])
     {
       arrValue[i] = arrCeiling[i];
       continue;
     }
-    arrValue[i] = arrValue[i - 1];
+    if (arrCeiling[i] >= arrFloor[i - 1] && arrCeiling[i] <= arrCeiling[i - 1] && arrFloor[i] <= arrFloor[i - 1])
+    {
+      if (arrCeiling[i] <= arrValue[i - 1])
+        arrValue[i] = arrCeiling[i];
+      else
+        arrValue[i] = arrValue[i - 1];
+      continue;
+    }
+    if (arrCeiling[i] <= arrCeiling[i - 1] && arrFloor[i] >= arrFloor[i - 1])
+    {
+      if (arrCeiling[i] <= arrValue[i - 1])
+        arrValue[i] = arrCeiling[i];
+      else if (arrFloor[i] <= arrValue[i - 1])
+        arrValue[i] = arrValue[i - 1];
+      else
+        arrValue[i] = arrFloor[i];
+      continue;
+    }
+    if (arrCeiling[i] >= arrCeiling[i - 1] && arrFloor[i] >= arrFloor[i - 1] && arrFloor[i] <= arrCeiling[i - 1])
+    {
+      if (arrFloor[i] <= arrValue[i - 1])
+        arrValue[i] = arrValue[i - 1];
+      else
+        arrValue[i] = arrFloor[i];
+      continue;
+    }
+    if (arrFloor[i] >= arrCeiling[i - 1])
+    {
+      arrValue[i] = arrFloor[i];
+      continue;
+    }
+    if (arrFloor[i] <= arrFloor[i - 1] && arrCeiling[i] >= arrCeiling[i - 1])
+    {
+      if (arrFloor[i] <= arrValue[i - 1])
+        arrValue[i] = arrValue[i - 1];
+      else
+        arrValue[i] = arrFloor[i];
+      continue;
+    }
+    // arrValue[i] = arrValue[i - 1];
   }
 }
 
@@ -31,18 +65,36 @@ void computedBack()
   int i;
   for (i = n - 2; i >= 0; --i)
   {
-    if (arrValue[i] <= arrValue[i + 1])
+    if (arrCeiling[i] <= arrFloor[i + 1])
       continue;
-    if (arrValue[i] >= arrCeiling[i + 1])
+    if (arrCeiling[i] >= arrFloor[i + 1] && arrCeiling[i] <= arrCeiling[i + 1] && arrFloor[i] <= arrFloor[i + 1])
     {
-      arrValue[i] = arrFloor[i] > arrValue[i + 1] ? arrFloor[i] : arrValue[i + 1];
+      if (arrValue[i + 1] <= arrValue[i])
+        arrValue[i] = arrValue[i + 1];
       continue;
     }
-    if (arrValue[i] > arrValue[i + 1])
+    if (arrCeiling[i] <= arrCeiling[i + 1] && arrFloor[i] >= arrFloor[i + 1])
     {
-      if (arrValue[i] == arrFloor[i])
-        continue;
-      arrValue[i] = arrValue[i + 1];
+      if (arrValue[i + 1] <= arrValue[i])
+        arrValue[i] = arrValue[i + 1] > arrFloor[i] ? arrValue[i + 1] : arrFloor[i];
+      continue;
+    }
+    if (arrCeiling[i] >= arrCeiling[i + 1] && arrFloor[i] >= arrFloor[i + 1] && arrFloor[i] <= arrCeiling[i + 1])
+    {
+      if (arrValue[i + 1] <= arrValue[i])
+        arrValue[i] = arrValue[i + 1] > arrFloor[i] ? arrValue[i + 1] : arrFloor[i];
+      continue;
+    }
+    if (arrFloor[i] >= arrCeiling[i + 1])
+    {
+      arrValue[i] = arrFloor[i];
+      continue;
+    }
+    if (arrFloor[i] <= arrFloor[i + 1] && arrCeiling[i] >= arrCeiling[i + 1])
+    {
+      if (arrValue[i + 1] <= arrValue[i])
+        arrValue[i] = arrValue[i + 1];
+      continue;
     }
   }
 }
