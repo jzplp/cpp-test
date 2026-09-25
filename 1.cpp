@@ -1,124 +1,43 @@
 #include <stdio.h>
-#define MAXN 1000005
+#define MAXMN 1005
 
-int arrFloor[MAXN];   // 地板
-int arrCeiling[MAXN]; // 天花板
-int arrValue[MAXN];   // 当前水位
-int n;
+int arr[MAXMN][MAXMN];
+int m, n;
 
-void computedFront()
+void outputArr()
 {
-  int i;
-  arrValue[0] = arrCeiling[0];
-  for (i = 1; i < n; ++i)
+  int i, j;
+  for (i = 0; i < m; ++i)
   {
-    if (arrCeiling[i] <= arrFloor[i - 1])
-    {
-      arrValue[i] = arrCeiling[i];
-      continue;
-    }
-    if (arrCeiling[i] >= arrFloor[i - 1] && arrCeiling[i] <= arrCeiling[i - 1] && arrFloor[i] <= arrFloor[i - 1])
-    {
-      if (arrCeiling[i] <= arrValue[i - 1])
-        arrValue[i] = arrCeiling[i];
-      else
-        arrValue[i] = arrValue[i - 1];
-      continue;
-    }
-    if (arrCeiling[i] <= arrCeiling[i - 1] && arrFloor[i] >= arrFloor[i - 1])
-    {
-      if (arrCeiling[i] <= arrValue[i - 1])
-        arrValue[i] = arrCeiling[i];
-      else if (arrFloor[i] <= arrValue[i - 1])
-        arrValue[i] = arrValue[i - 1];
-      else
-        arrValue[i] = arrFloor[i];
-      continue;
-    }
-    if (arrCeiling[i] >= arrCeiling[i - 1] && arrFloor[i] >= arrFloor[i - 1] && arrFloor[i] <= arrCeiling[i - 1])
-    {
-      if (arrFloor[i] <= arrValue[i - 1])
-        arrValue[i] = arrValue[i - 1];
-      else
-        arrValue[i] = arrFloor[i];
-      continue;
-    }
-    if (arrFloor[i] >= arrCeiling[i - 1])
-    {
-      arrValue[i] = arrFloor[i];
-      continue;
-    }
-    if (arrFloor[i] <= arrFloor[i - 1] && arrCeiling[i] >= arrCeiling[i - 1])
-    {
-      if (arrFloor[i] <= arrValue[i - 1])
-        arrValue[i] = arrValue[i - 1];
-      else
-        arrValue[i] = arrFloor[i];
-      continue;
-    }
-    // arrValue[i] = arrValue[i - 1];
+    for (j = 0; j < n; ++j)
+      printf("%d", arr[i][j]);
+    putchar('\n');
   }
-}
-
-void computedBack()
-{
-  int i;
-  for (i = n - 2; i >= 0; --i)
-  {
-    if (arrCeiling[i] <= arrFloor[i + 1])
-      continue;
-    if (arrCeiling[i] >= arrFloor[i + 1] && arrCeiling[i] <= arrCeiling[i + 1] && arrFloor[i] <= arrFloor[i + 1])
-    {
-      if (arrValue[i + 1] <= arrValue[i])
-        arrValue[i] = arrValue[i + 1];
-      continue;
-    }
-    if (arrCeiling[i] <= arrCeiling[i + 1] && arrFloor[i] >= arrFloor[i + 1])
-    {
-      if (arrValue[i + 1] <= arrValue[i])
-        arrValue[i] = arrValue[i + 1] > arrFloor[i] ? arrValue[i + 1] : arrFloor[i];
-      continue;
-    }
-    if (arrCeiling[i] >= arrCeiling[i + 1] && arrFloor[i] >= arrFloor[i + 1] && arrFloor[i] <= arrCeiling[i + 1])
-    {
-      if (arrValue[i + 1] <= arrValue[i])
-        arrValue[i] = arrValue[i + 1] > arrFloor[i] ? arrValue[i + 1] : arrFloor[i];
-      continue;
-    }
-    if (arrFloor[i] >= arrCeiling[i + 1])
-    {
-      arrValue[i] = arrFloor[i];
-      continue;
-    }
-    if (arrFloor[i] <= arrFloor[i + 1] && arrCeiling[i] >= arrCeiling[i + 1])
-    {
-      if (arrValue[i + 1] <= arrValue[i])
-        arrValue[i] = arrValue[i + 1];
-      continue;
-    }
-  }
+  putchar('\n');
 }
 
 int main()
 {
-  int z, i;
-  long long sum;
-  scanf("%d", &z);
-  while (z--)
+  int t;
+  int i, j;
+  char c;
+  scanf("%d", &t);
+  while (t--)
   {
-    scanf("%d", &n);
-    for (i = 0; i < n; ++i)
-      scanf("%d", &arrFloor[i]);
-    for (i = 0; i < n; ++i)
-      scanf("%d", &arrCeiling[i]);
-    computedFront();
-    computedBack();
-    sum = 0;
-    for (i = 0; i < n; ++i)
+    scanf("%d %d", &m, &n);
+    for (i = 0; i < m; ++i)
     {
-      sum += arrValue[i] - arrFloor[i];
+      getchar();
+      for (j = 0; j < n; ++j)
+      {
+        scanf("%c", &c);
+        if (c == '.')
+          arr[i][j] = 1;
+        else
+          arr[i][j] = 0;
+      }
     }
-    printf("%lld\n", sum);
+    outputArr();
   }
 
   return 0;
