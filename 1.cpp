@@ -18,7 +18,7 @@ void outputArr()
   for (i = 0; i < m; ++i)
   {
     for (j = 0; j < n; ++j)
-      printf("%d", arr[i][j]);
+      printf("%d", arrTop[i][j]);
     putchar('\n');
   }
   putchar('\n');
@@ -35,7 +35,7 @@ void getArrTop()
       if (arr[j][i] == 0)
         arrTop[j][i] = 0;
       else
-        arr[j][i] = arrTop[j - 1][i] + 1;
+        arrTop[j][i] = arrTop[j - 1][i] + 1;
     }
   }
 }
@@ -45,16 +45,28 @@ struct Node
   int num, top;
 };
 
+void printList(list<Node> &ls)
+{
+  for (auto ip = ls.begin(); ip != ls.end(); ++ip)
+  {
+    printf("top %d num %d\n", ip->top, ip->num);
+  }
+}
+
 void computed(int line)
 {
   int i, j, maxV, value;
   list<Node> ls;
   auto ip = ls.begin(), ipt = ls.begin();
-  for (i = 0; i < m; ++i)
+  for (i = 0; i < n; ++i)
   {
-    if (arr[line][i] == 0)
+    if (arr[line][i] == 0) {
+      // 清空list
+      ls.clear();
       continue;
+    }
     Node no = {i, arrTop[line][i]};
+    ls.push_back(no);
     // 统一调整限高
     for (ip = ls.begin(); ip != ls.end(); ++ip)
     {
