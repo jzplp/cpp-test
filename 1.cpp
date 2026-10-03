@@ -32,7 +32,6 @@ int judge()
     if (sArr[i] == '?')
       ++sQuesNum;
   }
-  // printf("%d %d %d %d %d\n", sZeroNum, sOneNum, sQuesNum, tZeroNum, tOneNum);
   if (tZeroNum > sZeroNum + sQuesNum)
     return false;
   return true;
@@ -47,7 +46,7 @@ int computed()
   {
     if (sArr[i] != '?')
       continue;
-    if (tArr[i] != '0')
+    if (tArr[i] == '0')
     {
       sArr[i] = '0';
       sQuesNum--;
@@ -56,24 +55,21 @@ int computed()
     }
   }
   // 如果0依然不够，那就从1的位置补齐
-  if (sZeroNum < tZeroNum)
+  for (i = 0; i < n; ++i)
   {
-    for (i = 0; i < n; ++i)
+    if (sArr[i] != '?')
+      continue;
+    if (sZeroNum < tZeroNum)
     {
-      if (sArr[i] != '?')
-        continue;
-      if (sZeroNum < tZeroNum)
-      {
-        sArr[i] = '0';
-        ++sZeroNum;
-      }
-      else
-      {
-        sArr[i] = '1';
-        ++sOneNum;
-      }
-      ++num;
+      sArr[i] = '0';
+      ++sZeroNum;
     }
+    else
+    {
+      sArr[i] = '1';
+      ++sOneNum;
+    }
+    ++num;
   }
   // 找出两者的不同的点，如果是0-1和0-1的不同可以交换，剩下的不同则只能变换
   j = 0;
