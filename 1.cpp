@@ -1,104 +1,109 @@
-#include <iostream>
-#include <string>
-#include <vector>
-#include <algorithm>
-using namespace std;
+#include <stdio.h>
+#include <stdlib.h>
+#define MAXN 105
 
-vector<string> ve;
+char sArr[MAXN];
+char tArr[MAXN];
+int n;
+int sZeroNum, sOneNum, sQuesNum;
+int tZeroNum, tOneNum;
 
-void output()
+int judge()
 {
-  for (auto ip = ve.begin(); ip != ve.end(); ++ip)
-    cout << *ip << endl;
+  int i;
+  sZeroNum = 0;
+  sOneNum = 0;
+  sQuesNum = 0;
+  tZeroNum = 0;
+  tOneNum = 0;
+  for (n = 0; tArr[n] != 0; ++n)
+  {
+    if (tArr[n] == '0')
+      ++tZeroNum;
+    if (tArr[n] == '1')
+      ++tOneNum;
+  }
+  for (i = 0; i < n; ++i)
+  {
+    if (sArr[i] == '0')
+      ++sZeroNum;
+    if (sArr[i] == '1')
+      ++sOneNum;
+    if (sArr[i] == '?')
+      ++sQuesNum;
+  }
+  // printf("%d %d %d %d %d\n", sZeroNum, sOneNum, sQuesNum, tZeroNum, tOneNum);
+  if (tZeroNum > sZeroNum + sQuesNum)
+    return false;
+  return true;
 }
 
-string computed(int a)
+int computed()
 {
-  string s;
-  int i, j;
-  for (i = 0; i < ve[a - 1].size(); ++i)
+  int num = 0;
+  int i, j, k;
+  // 所有问号对应0的位置先赋值
+  for (i = 0; i < n; ++i)
   {
-    if (i >= ve[a].size())
-      break;
-    if (ve[a][i] == ve[a - 1][i])
-      s.push_back(ve[a][i]);
-    else if (ve[a][i] == ve[a - 1][i] + 1)
+    if (sArr[i] != '?')
+      continue;
+    if (tArr[i] != '0')
     {
-      if (i == ve[a].size() - 1 && i == ve[a - 1].size() - 1)
-      {
-        return ve[a - 1];
-      }
-      if ((i != ve[a].size() - 1) && (i != ve[a - 1].size() - 1))
-      {
-        s.push_back(ve[a][i]);
-        return s;
-      }
-      if ((i == ve[a].size() - 1) && (i != ve[a - 1].size() - 1))
-      {
-        s.push_back(ve[a - 1][i]);
-        for (j = i + 1; j < ve[a - 1].size(); ++j)
-        {
-          if (ve[a - 1][j] == 'Z')
-            s.push_back(ve[a - 1][j]);
-          else
-          {
-            if (j == ve[a - 1].size() - 1)
-              s.push_back(ve[a - 1][j]);
-            else
-              s.push_back(ve[a - 1][j] + 1);
-            return s;
-          }
-        }
-        return s;
-      }
-      if ((i != ve[a].size() - 1) && (i == ve[a - 1].size() - 1))
-      {
-        return ve[a - 1];
-      }
-    }
-    else
-    {
-      if (i == ve[a].size() - 1 && i == ve[a - 1].size() - 1)
-      {
-        return ve[a - 1];
-      }
-      if (i != ve[a].size() - 1 && i != ve[a - 1].size() - 1)
-      {
-        s.push_back(ve[a - 1][i] + 1);
-        return s;
-      }
-      if (i == ve[a].size() - 1 && i != ve[a - 1].size() - 1)
-      {
-        s.push_back(ve[a - 1][i] + 1);
-        return s;
-      }
-      if (i != ve[a].size() - 1 && i == ve[a - 1].size() - 1)
-      {
-        s.push_back(ve[a - 1][i] + 1);
-        return s;
-      }
+      sArr[i] = '0';
+      sQuesNum--;
+      sZeroNum++;
+      ++num;
     }
   }
-  if (i < ve[a].size())
-    return ve[a - 1];
-  return s;
+  // 如果0依然不够，那就从1的位置补齐
+  if (sZeroNum < tZeroNum)
+  {
+    for (i = 0; i < n; ++i)
+    {
+      if (sArr[i] != '?')
+        continue;
+      if (sZeroNum < tZeroNum)
+      {
+        sArr[i] = '0';
+        ++sZeroNum;
+      }
+      else
+      {
+        sArr[i] = '1';
+        ++sOneNum;
+      }
+      ++num;
+    }
+  }
+  // 找出两者的不同的点，如果是0-1和0-1的不同可以交换，剩下的不同则只能变换
+  j = 0;
+  k = 0;
+  for (i = 0; i < n; ++i)
+  {
+    if (sArr[i] == '0' && tArr[i] == '1')
+      ++j;
+    if (sArr[i] == '1' && tArr[i] == '0')
+      ++k;
+  }
+  num += j > k ? j : k;
+  return num;
 }
 
 int main()
 {
-  int n, i, j;
-  string s;
-  while (cin >> n && n > 0)
+  int t, i;
+  scanf("%d", &t);
+  for (int ti = 0; ti < t; ++ti)
   {
-    ve.clear();
-    for (i = 0; i < n; ++i)
+    scanf("%s", sArr);
+    scanf("%s", tArr);
+    printf("Case %d: ", ti + 1);
+    if (!judge())
     {
-      cin >> s;
-      ve.push_back(s);
+      printf("-1\n");
+      continue;
     }
-    sort(ve.begin(), ve.end());
-    i = n / 2;
-    cout << computed(i) << endl;
-    // output();
+    printf("%d\n", computed());
   }
+  return 0;
 }
