@@ -1,68 +1,80 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <map>
-
+#include <iostream>
+#include <string>
+#include <vector>
+#include <algorithm>
 using namespace std;
 
-map<int, int> mp;
-int n, l;
+vector<string> ve;
 
-void reduce(int i)
+void output()
 {
-  if (mp[i] > 1)
-    mp[i]--;
-  else
-    mp.erase(i);
+  for (auto ip = ve.begin(); ip != ve.end(); ++ip)
+    cout << *ip << endl;
 }
 
-int computed()
+string computed(int a)
 {
-  int num = 0;
+  string s;
   int i, j;
-  auto ip = mp.end(), jp = mp.end();
-  while (!mp.empty())
+  for (i = 0; i < ve[a - 1].size(); ++i)
   {
-    ++num;
-    // 找出当前最大的元素
-    ip = mp.end();
-    ip--;
-    i = ip->first;
-    reduce(i);
-    // 尝试找出适配的元素
-    if (l == i)
-      continue;
-    if (mp.empty())
+    if (i >= ve[a].size())
       break;
-    ip = mp.upper_bound(l - i);
-    if (ip == mp.begin())
-      continue;
-    --ip;
-    reduce(ip->first);
+    if (ve[a][i] == ve[a - 1][i])
+      s.push_back(ve[a][i]);
+    else if (ve[a][i] == ve[a - 1][i] + 1)
+    {
+      s.push_back(ve[a - 1][i]);
+      return s;
+    }
+    else
+    {
+      s.push_back(ve[a - 1][i] + 1);
+      return s;
+    }
   }
-
-  return num;
+  if (i < ve[a - 1].size())
+  {
+    if (ve[a - 1][i] != 'Z')
+    {
+      s.push_back(ve[a - 1][i] + 1);
+      return s;
+    }
+    else
+    {
+      s.push_back(ve[a - 1][i]);
+      // s.push_back('A');
+      return s;
+    }
+  }
+  if (i < ve[a].size())
+  {
+    if (ve[a][i] != 'A')
+    {
+      // s.push_back(ve[a][i] - 1);
+      return s;
+    }
+    else
+      return s;
+  }
+  return s;
 }
 
 int main()
 {
-  int t, i, j, k;
-  scanf("%d", &t);
-  while (t--)
+  int n, i, j;
+  string s;
+  while (cin >> n && n > 0)
   {
-    scanf("%d %d", &n, &l);
-    mp.clear();
+    ve.clear();
     for (i = 0; i < n; ++i)
     {
-      scanf("%d", &j);
-      if (!mp[j])
-        mp[j] = 1;
-      else
-        mp[j] += 1;
+      cin >> s;
+      ve.push_back(s);
     }
-    printf("%d\n", computed());
-    if (t != 0)
-      putchar('\n');
+    sort(ve.begin(), ve.end());
+    i = n / 2;
+    cout << computed(i) << endl;
+    // output();
   }
-  return 0;
 }
