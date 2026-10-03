@@ -24,39 +24,63 @@ string computed(int a)
       s.push_back(ve[a][i]);
     else if (ve[a][i] == ve[a - 1][i] + 1)
     {
-      s.push_back(ve[a - 1][i]);
-      return s;
+      if (i == ve[a].size() - 1 && i == ve[a - 1].size() - 1)
+      {
+        return ve[a - 1];
+      }
+      if ((i != ve[a].size() - 1) && (i != ve[a - 1].size() - 1))
+      {
+        s.push_back(ve[a][i]);
+        return s;
+      }
+      if ((i == ve[a].size() - 1) && (i != ve[a - 1].size() - 1))
+      {
+        s.push_back(ve[a - 1][i]);
+        for (j = i + 1; j < ve[a - 1].size(); ++j)
+        {
+          if (ve[a - 1][j] == 'Z')
+            s.push_back(ve[a - 1][j]);
+          else
+          {
+            if (j == ve[a - 1].size() - 1)
+              s.push_back(ve[a - 1][j]);
+            else
+              s.push_back(ve[a - 1][j] + 1);
+            return s;
+          }
+        }
+        return s;
+      }
+      if ((i != ve[a].size() - 1) && (i == ve[a - 1].size() - 1))
+      {
+        return ve[a - 1];
+      }
     }
     else
     {
-      s.push_back(ve[a - 1][i] + 1);
-      return s;
-    }
-  }
-  if (i < ve[a - 1].size())
-  {
-    if (ve[a - 1][i] != 'Z')
-    {
-      s.push_back(ve[a - 1][i] + 1);
-      return s;
-    }
-    else
-    {
-      s.push_back(ve[a - 1][i]);
-      // s.push_back('A');
-      return s;
+      if (i == ve[a].size() - 1 && i == ve[a - 1].size() - 1)
+      {
+        return ve[a - 1];
+      }
+      if (i != ve[a].size() - 1 && i != ve[a - 1].size() - 1)
+      {
+        s.push_back(ve[a - 1][i] + 1);
+        return s;
+      }
+      if (i == ve[a].size() - 1 && i != ve[a - 1].size() - 1)
+      {
+        s.push_back(ve[a - 1][i] + 1);
+        return s;
+      }
+      if (i != ve[a].size() - 1 && i == ve[a - 1].size() - 1)
+      {
+        s.push_back(ve[a - 1][i] + 1);
+        return s;
+      }
     }
   }
   if (i < ve[a].size())
-  {
-    if (ve[a][i] != 'A')
-    {
-      // s.push_back(ve[a][i] - 1);
-      return s;
-    }
-    else
-      return s;
-  }
+    return ve[a - 1];
   return s;
 }
 
