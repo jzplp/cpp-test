@@ -1,105 +1,81 @@
 #include <stdio.h>
-#include <stdlib.h>
-#define MAXN 105
+#include <map>
+#define MAXN 100005
+using namespace std;
 
-char sArr[MAXN];
-char tArr[MAXN];
-int n;
-int sZeroNum, sOneNum, sQuesNum;
-int tZeroNum, tOneNum;
+int s1[MAXN];
+int n, d;
+int s2[MAXN];
 
-int judge()
+// beg 起始位置 end 终点的下一个位置
+struct Stru
 {
-  int i;
-  sZeroNum = 0;
-  sOneNum = 0;
-  sQuesNum = 0;
-  tZeroNum = 0;
-  tOneNum = 0;
-  for (n = 0; tArr[n] != 0; ++n)
-  {
-    if (tArr[n] == '0')
-      ++tZeroNum;
-    if (tArr[n] == '1')
-      ++tOneNum;
-  }
-  for (i = 0; i < n; ++i)
-  {
-    if (sArr[i] == '0')
-      ++sZeroNum;
-    if (sArr[i] == '1')
-      ++sOneNum;
-    if (sArr[i] == '?')
-      ++sQuesNum;
-  }
-  if (tZeroNum > sZeroNum + sQuesNum)
-    return false;
-  return true;
-}
+  int beg, end;
+};
 
-int computed()
+void computed(int s2len, map<int, Stru> &mp)
 {
-  int num = 0;
   int i, j, k;
-  // 所有问号对应0的位置先赋值
+  int c1;
+  bool flag;
   for (i = 0; i < n; ++i)
   {
-    if (sArr[i] != '?')
-      continue;
-    if (tArr[i] == '0')
+    if (mp.count(s1[i]))
     {
-      sArr[i] = '0';
-      sQuesNum--;
-      sZeroNum++;
-      ++num;
-    }
-  }
-  // 如果0依然不够，那就从1的位置补齐
-  for (i = 0; i < n; ++i)
-  {
-    if (sArr[i] != '?')
-      continue;
-    if (sZeroNum < tZeroNum)
-    {
-      sArr[i] = '0';
-      ++sZeroNum;
+      if (s2len - mp[s1[i]].end <= n - i)
+        continue;
+      mp[s1[i]].end = mp[s1[i]].end + 1;
+      for (c1 = s1[i] - 1; c1 >= 0; --c1)
+      {
+        if (mp.count(c1))
+          mp.erase(c1);
+      }
     }
     else
     {
-      sArr[i] = '1';
-      ++sOneNum;
+      flag = true;
+      if (s1[i] == 9)
+        mp[9] = {0, 1};
+      else
+      {
+        for (c1 = s1[i] + 1; c1 <= 9; ++c1)
+        {
+          if (mp.count(c1))
+          {
+            if (s2len - mp[c1].end <= n - i)
+            {
+              flag = false;
+              break;
+            }
+            mp[s1[i]] = {mp[c1].end, mp[c1].end + 1};
+            break;
+          }
+        }
+        if (c1 > 9)
+          mp[s1[i]] = {0, 1};
+      }
+      if (flag)
+        for (c1 = s1[i] - 1; c1 >= 0; --c1)
+        {
+          if (mp.count(c1))
+            mp.erase(c1);
+        }
     }
-    ++num;
   }
-  // 找出两者的不同的点，如果是0-1和0-1的不同可以交换，剩下的不同则只能变换
-  j = 0;
-  k = 0;
-  for (i = 0; i < n; ++i)
-  {
-    if (sArr[i] == '0' && tArr[i] == '1')
-      ++j;
-    if (sArr[i] == '1' && tArr[i] == '0')
-      ++k;
-  }
-  num += j > k ? j : k;
-  return num;
 }
 
 int main()
 {
-  int t, i;
-  scanf("%d", &t);
-  for (int ti = 0; ti < t; ++ti)
+  int i, s2len;
+  while (scanf("%d %d", &n, &d) >= 2 && n > 0 && d > 0)
   {
-    scanf("%s", sArr);
-    scanf("%s", tArr);
-    printf("Case %d: ", ti + 1);
-    if (!judge())
-    {
-      printf("-1\n");
-      continue;
-    }
-    printf("%d\n", computed());
+    scanf("%s", s1);
+    s2len = n - d;
+    map<int, Stru> mp;
+    for (i = 0; i < n; ++i)
+      s1[i] = s1[i] - '0';
+    computed(s2len, mp);
+    putchar('\n');
   }
   return 0;
 }
