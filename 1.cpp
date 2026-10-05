@@ -40,6 +40,8 @@ void computed()
     // printf("%d %d %d\n", i, s1[i], int(mp.count(s1[i])));
     if (mp.count(s1[i]))
     {
+      if (s2len - mp[s1[i]].end <= 0)
+        continue;
       if (s2len - mp[s1[i]].end >= n - i)
       {
         mp2[s2len - (n - i)] = s1[i];
@@ -62,6 +64,8 @@ void computed()
       {
         if (mp.count(c1))
         {
+          if (s2len - mp[c1].end <= 0)
+            continue;
           if (s2len - mp[c1].end >= n - i)
           {
             mp2[s2len - (n - i)] = s1[i];
@@ -103,25 +107,19 @@ void computed()
 void outputRes()
 {
   int i, j, k = 0;
-  for (i = 9; i >= 0; --i)
+  for (i = 0; i < s2len; ++i)
   {
-    if (!mp.count(i))
+    if (mp2.count(i))
+    {
+      putchar(mp2[i] + '0');
       continue;
-    for (j = mp[i].beg; j < mp[i].end; ++j)
-    {
-      if (mp2.count(j))
-        putchar(mp2[j] + '0');
-      else
-        putchar(i + '0');
     }
-    k = j;
-  }
-  if (k < s2len - 1)
-  {
-    for (; k < s2len; ++k)
+    for (j = 9; j >= 0; --j)
     {
-      if (mp2.count(k))
-        putchar(mp2[k] + '0');
+      if (!mp.count(j))
+        continue;
+      if (i >= mp[j].beg && i < mp[j].end)
+        putchar(j + '0');
     }
   }
   putchar('\n');
