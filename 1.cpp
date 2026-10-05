@@ -16,6 +16,7 @@ int s2len;
 map<int, Stru> mp;
 map<int, int> mp2;
 
+// 调试输出
 void outMap()
 {
   printf("mp:\n");
@@ -31,24 +32,27 @@ void outMap()
   putchar('\n');
 }
 
+// 尾部所有元素一一对应
+void setTail(int i)
+{
+  int j;
+  mp2[s2len - (n - i)] = s1[i];
+  for (j = i + 1; j < n; ++j)
+    mp2[s2len - (n - j)] = s1[j];
+}
+
 void computed()
 {
-  int i, j, k;
-  int c1;
+  int i, c1;
   for (i = 0; i < n; ++i)
   {
-    // printf("%d %d %d\n", i, s1[i], int(mp.count(s1[i])));
     if (mp.count(s1[i]))
     {
       if (s2len - mp[s1[i]].end <= 0)
         continue;
       if (s2len - mp[s1[i]].end >= n - i)
       {
-        mp2[s2len - (n - i)] = s1[i];
-        for (j = i + 1; j < n; ++j)
-        {
-          mp2[s2len - (n - j)] = s1[j];
-        }
+        setTail(i);
         return;
       }
       mp[s1[i]].end = mp[s1[i]].end + 1;
@@ -65,14 +69,10 @@ void computed()
         if (mp.count(c1))
         {
           if (s2len - mp[c1].end <= 0)
-            continue;
+            break;
           if (s2len - mp[c1].end >= n - i)
           {
-            mp2[s2len - (n - i)] = s1[i];
-            for (j = i + 1; j < n; ++j)
-            {
-              mp2[s2len - (n - j)] = s1[j];
-            }
+            setTail(i);
             return;
           }
           mp[s1[i]] = {mp[c1].end, mp[c1].end + 1};
@@ -83,12 +83,7 @@ void computed()
       {
         if (s2len >= n - i)
         {
-          // printf("---- %d %d\n", n-i, s2len - (n - i));
-          mp2[s2len - (n - i)] = s1[i];
-          for (j = i + 1; j < n; ++j)
-          {
-            mp2[s2len - n - j] = s1[j];
-          }
+          setTail(i);
           return;
         }
         else
@@ -100,13 +95,14 @@ void computed()
           mp.erase(c1);
       }
     }
+    // printf("-- i: %d \n", i);
     // outMap();
   }
 }
 
 void outputRes()
 {
-  int i, j, k = 0;
+  int i, j;
   for (i = 0; i < s2len; ++i)
   {
     if (mp2.count(i))
