@@ -1,15 +1,17 @@
 #include <stdio.h>
+#include <string.h>
 #define MAXN 8195
 
 // 每种折叠次数对应的折痕序列 0 顺时针 1 逆时针
 int foldsArr[14][MAXN];
 // foldn 现有的折叠次数长度
 int n, foldn;
-// 折痕图序列 x y 0为- 1为|
+// 折痕图序列 x y 0为_ 1为|
 int figureArr[MAXN][3];
 int figureLen;
 // 折痕图
-int figure[MAXN][MAXN];
+char figure[MAXN][MAXN];
+int maxx, maxy;
 
 // 计算折痕序列长度
 int getFoldsLen(int a)
@@ -62,7 +64,7 @@ void outFigureArr()
 
 /*
   StepsX[i][j][k]
-  i=0 -  i=1 |
+  i=0 _  i=1 |
   j为折痕的0和1
   k=0 往左或者往上 k=1 往右或者往下
   StepsX 值为x坐标
@@ -94,16 +96,48 @@ void genFigureArr()
 }
 
 // 生成折痕图
-void genFigure() {
-    // 折痕图序列长度
+void genFigure()
+{
+  int i, j, k;
+  // 折痕图序列长度
   int len = getFoldsLen(n) + 1;
   int minx = figureArr[0][0];
   int miny = figureArr[0][1];
-  
+  maxx = 0;
+  maxy = 0;
+  for (i = 0; i < len; ++i)
+  {
+    if (minx > figureArr[i][0])
+      minx = figureArr[i][0];
+    if (miny > figureArr[i][1])
+      miny = figureArr[i][1];
+  }
+  for (i = 0; i < len; ++i)
+  {
+    figureArr[i][0] -= minx;
+    figureArr[i][1] -= miny;
+    if (maxx < figureArr[i][0])
+      maxx = figureArr[i][0];
+    if (maxy < figureArr[i][1])
+      maxy = figureArr[i][1];
+  }
+  memset(figure, 0, sizeof(figure));
+  for (i = 0; i < len; ++i)
+    figure[figureArr[i][0]][figureArr[i][1]] = figureArr[i][2] == 1 ? '|' : '_';
 }
 
 // 输出折痕图
-void outFigure() {}
+void outFigure()
+{
+  int i, j;
+  for (i = 0; i <= maxx; ++i)
+  {
+    for (j = 0; j <= maxy; ++j)
+      printf("%c", figure[i][j] ? figure[i][j] : ' ');
+    putchar('\n');
+  }
+  printf("^\n");
+}
 
 int main()
 {
@@ -122,6 +156,6 @@ int main()
     genFigure();
     outFigure();
   }
-  outFoldArr();
+  // outFoldArr();
   return 0;
 }
