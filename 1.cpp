@@ -71,14 +71,14 @@ void outFigureArr()
   StepsY 值为y坐标
   StepsD 值为下一步方向，就是k
 */
-int StepsX[2][2][2] = {{{-1, 1}, {-1, 1}}, {{1, -1}, {-1, 1}}};
-int StepsY[2][2][2] = {{{0, -1}, {-1, 0}}, {{1, 0}, {1, 0}}};
+int StepsX[2][2][2] = {{{0, -1}, {-1, 0}}, {{1, 0}, {1, 0}}};
+int StepsY[2][2][2] = {{{-1, 1}, {-1, 1}}, {{1, -1}, {-1, 1}}};
 int StepsD[2][2][2] = {{{0, 1}, {1, 0}}, {{1, 0}, {0, 1}}};
 
 // 生成折痕图序列
 void genFigureArr()
 {
-  int i, j, k;
+  int i;
   // 折痕序列长度
   int len = getFoldsLen(n);
   // 生成折痕图序列
@@ -88,10 +88,10 @@ void genFigureArr()
   int d = 1; // 方向
   for (i = 0; i < len; ++i)
   {
-    figureArr[i + 1][0] = figureArr[i][0] + StepsX[figureArr[i + 1][2]][foldsArr[n][i]][d];
-    figureArr[i + 1][1] = figureArr[i][1] + StepsY[figureArr[i + 1][2]][foldsArr[n][i]][d];
+    figureArr[i + 1][0] = figureArr[i][0] + StepsX[figureArr[i][2]][foldsArr[n][i]][d];
+    figureArr[i + 1][1] = figureArr[i][1] + StepsY[figureArr[i][2]][foldsArr[n][i]][d];
     figureArr[i + 1][2] = figureArr[i][2] == 1 ? 0 : 1;
-    d = StepsD[figureArr[i + 1][2]][foldsArr[n][i]][d];
+    d = StepsD[figureArr[i][2]][foldsArr[n][i]][d];
   }
 }
 
@@ -130,10 +130,21 @@ void genFigure()
 void outFigure()
 {
   int i, j;
+  // 所有空白转成空格
   for (i = 0; i <= maxx; ++i)
   {
     for (j = 0; j <= maxy; ++j)
-      printf("%c", figure[i][j] ? figure[i][j] : ' ');
+      figure[i][j] = figure[i][j] ? figure[i][j] : ' ';
+  }
+  // 末尾的空格不要否则PE
+  for (i = 0; i <= maxx; ++i)
+  {
+    for (j = maxy; figure[i][j] == ' '; --j)
+      figure[i][j] = 0;
+  }
+  for (i = maxx; i >= 0; --i)
+  {
+    printf("%s", figure[i]);
     putchar('\n');
   }
   printf("^\n");
@@ -145,17 +156,15 @@ int main()
   foldn = 1;
   while (scanf("%d", &n) > 0 && n > 0)
   {
-    if (foldn < n)
+    if (foldn <= n)
     {
       for (i = foldn; i <= n; ++i)
         genFoldArr(i);
       foldn = n + 1;
     }
     genFigureArr();
-    outFigureArr();
     genFigure();
     outFigure();
   }
-  // outFoldArr();
   return 0;
 }
