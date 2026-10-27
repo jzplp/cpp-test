@@ -15,25 +15,25 @@ void print()
   putchar('\n');
 }
 
-void oper1()
+void oper2()
 {
   int i, j, a;
   a = arr[1];
   for (i = 2; i <= n; ++i)
     arr[i - 1] = arr[i];
   arr[n] = a;
-  steps[sn] = 1;
+  steps[sn] = 2;
   ++sn;
   // printf("1\n");
   // print();
 }
 
-void oper2()
+void oper1()
 {
   int a = arr[1];
   arr[1] = arr[2];
   arr[2] = a;
-  steps[sn] = 2;
+  steps[sn] = 1;
   ++sn;
   // printf("2\n");
   // print();
@@ -45,11 +45,11 @@ void compuetd()
   for (i = n - 1; i > 0; --i)
   {
     while (arr[1] != i)
-      oper1();
+      oper2();
     while (arr[2] != i + 1)
     {
-      oper2();
       oper1();
+      oper2();
     }
   }
 }
