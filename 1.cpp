@@ -1,77 +1,109 @@
 #include <stdio.h>
-#define MAXN 305
+#include <math.h>
+#define MAXN 16400
 
-int arr[MAXN];      // 当前数据
-int arrIndex[MAXN]; // 序号，目前除了初始化后用不到
+double scoreArr[MAXN][3];
+int rankArr[MAXN];
 int n;
-int steps[MAXN * MAXN * 2 + 5];
-int sn;
+double v;
+double darr[10];
 
-void print()
+int compare(double a, double b)
 {
-  int i;
-  for (i = 1; i <= n; ++i)
-    printf("%d", arr[i]);
-  putchar('\n');
+  if (abs(a - b) < 1e-6) return 0;
+  if(a > b) return 1;
+  return -1;
 }
 
-void oper2()
+bool judge(int i, double v1, int j, double v2)
 {
-  int i, j, a;
-  a = arr[1];
-  for (i = 2; i <= n; ++i)
-    arr[i - 1] = arr[i];
-  arr[n] = a;
-  steps[sn] = 2;
-  ++sn;
-  // printf("1\n");
-  // print();
+  if (compare(v1, v2) > 0)
+    return true;
+  if (compare(v1, v2) == 0 && i < j)
+    return true;
+  return false;
 }
 
-void oper1()
+void sort(double *arr, int len)
 {
-  int a = arr[1];
-  arr[1] = arr[2];
-  arr[2] = a;
-  steps[sn] = 1;
-  ++sn;
-  // printf("2\n");
-  // print();
-}
-
-void compuetd()
-{
-  int i, j, k;
-  for (i = n - 1; i > 0; --i)
+  int a, b, c;
+  double d;
+  for (a = 1; a <= len; ++a)
   {
-    while (arr[1] != i)
-      oper2();
-    while (arr[2] != i + 1)
+    c = a;
+    for (b = a + 1; b <= len; ++b)
     {
-      oper1();
-      oper2();
+      if (compare(arr[c], arr[b]) < 0)
+        c = b;
+    }
+    if (c != a)
+    {
+      d = arr[a];
+      arr[a] = arr[c];
+      arr[c] = d;
     }
   }
 }
 
+void print(double *arr, int len)
+{
+  for (int i = 1; i <= len; ++i)
+    printf("%.2lf ", arr[i]);
+  putchar('\n');
+}
+
+bool computed()
+{
+  v = scoreArr[rankArr[1]][0] + scoreArr[rankArr[1]][1] + scoreArr[rankArr[1]][2];
+  int vi = rankArr[1];
+  double v1, v2;
+  int i, j, k;
+  for (i = 2; i <= n; ++i)
+  {
+    double darr[10] = {
+        0,
+        scoreArr[rankArr[i]][0] + scoreArr[rankArr[i]][1] + scoreArr[rankArr[i]][2],
+        scoreArr[rankArr[i]][0] + scoreArr[rankArr[i]][1],
+        scoreArr[rankArr[i]][0] + scoreArr[rankArr[i]][2],
+        scoreArr[rankArr[i]][1] + scoreArr[rankArr[i]][2],
+        scoreArr[rankArr[i]][0],
+        scoreArr[rankArr[i]][1],
+        scoreArr[rankArr[i]][2],
+        0};
+    sort(darr, 8);
+    // print(darr, 8);
+    for (j = 1; j <= 8; ++j)
+    {
+      v1 = darr[j];
+      if (judge(vi, v, rankArr[i], v1))
+      {
+        v = v1;
+        vi = rankArr[i];
+        break;
+      }
+    }
+    if (j == 9)
+      return false;
+  }
+  return true;
+}
+
 int main()
 {
-  int i, j;
+  int i, j, k = 0;
+  int i1, i2, i3;
   while (scanf("%d", &n) > 0 && n > 0)
   {
+    ++k;
     for (i = 1; i <= n; ++i)
-    {
-      // 直接变为从乱排列到 1,2...,n的排列的问题
-      scanf("%d", &arrIndex[i]);
-      arr[arrIndex[i]] = i;
-    }
-    sn = 0;
-    compuetd();
-    for (i = 0; i < sn; ++i)
-    {
-      printf("%d", steps[i]);
-    }
-    putchar('\n');
+      scanf("%lf %lf %lf\n", &scoreArr[i][0], &scoreArr[i][1], &scoreArr[i][2]);
+    for (i = 1; i <= n; ++i)
+      scanf("%d", &rankArr[i]);
+    printf("Case %d: ", k);
+    if (!computed())
+      printf("No solution\n");
+    else
+      printf("%.2lf\n", v);
   }
   return 0;
 }
