@@ -1,109 +1,75 @@
 #include <stdio.h>
-#include <math.h>
-#define MAXN 16400
+#include <list>
+#define MAXN 10005
 
-double scoreArr[MAXN][3];
-int rankArr[MAXN];
-int n;
-double v;
-double darr[10];
+using namespace std;
 
-int compare(double a, double b)
+int n, m;
+list<int> edgeArr[MAXN];
+int colorArr[MAXN];
+int degree;
+
+void init()
 {
-  if (abs(a - b) < 1e-6) return 0;
-  if(a > b) return 1;
-  return -1;
+  int i;
+  for (i = 0; i < MAXN; ++i)
+  {
+    edgeArr[i].clear();
+    colorArr[i] = 0;
+  }
 }
 
-bool judge(int i, double v1, int j, double v2)
+void setDegree()
 {
-  if (compare(v1, v2) > 0)
+  int i, j;
+  degree = 0;
+  for (i = 1; i <= n; ++i)
+    if (edgeArr[i].size() > degree)
+      degree = edgeArr[i].size();
+  if (degree % 2 == 0)
+    ++degree;
+}
+
+bool dfs(int a, list<int>::const_iterator ai)
+{
+  if (ai == edgeArr[a].end())
     return true;
-  if (compare(v1, v2) == 0 && i < j)
+  if (colorArr[*ai])
+  {
+    if (colorArr[*ai] == colorArr[a])
+      return false;
     return true;
+  }
+
+  for (int i = 1; i <= degree; ++i)
+  {
+    if(i == colorArr[a]) continue;
+    colorArr[*ai] = i;
+    if (dfs(v))
+      continue;
+    colorArr[v] = 0;
+  }
   return false;
 }
-
-void sort(double *arr, int len)
-{
-  int a, b, c;
-  double d;
-  for (a = 1; a <= len; ++a)
-  {
-    c = a;
-    for (b = a + 1; b <= len; ++b)
-    {
-      if (compare(arr[c], arr[b]) < 0)
-        c = b;
-    }
-    if (c != a)
-    {
-      d = arr[a];
-      arr[a] = arr[c];
-      arr[c] = d;
-    }
-  }
-}
-
-void print(double *arr, int len)
-{
-  for (int i = 1; i <= len; ++i)
-    printf("%.2lf ", arr[i]);
-  putchar('\n');
-}
-
-bool computed()
-{
-  v = scoreArr[rankArr[1]][0] + scoreArr[rankArr[1]][1] + scoreArr[rankArr[1]][2];
-  int vi = rankArr[1];
-  double v1, v2;
-  int i, j, k;
-  for (i = 2; i <= n; ++i)
-  {
-    double darr[10] = {
-        0,
-        scoreArr[rankArr[i]][0] + scoreArr[rankArr[i]][1] + scoreArr[rankArr[i]][2],
-        scoreArr[rankArr[i]][0] + scoreArr[rankArr[i]][1],
-        scoreArr[rankArr[i]][0] + scoreArr[rankArr[i]][2],
-        scoreArr[rankArr[i]][1] + scoreArr[rankArr[i]][2],
-        scoreArr[rankArr[i]][0],
-        scoreArr[rankArr[i]][1],
-        scoreArr[rankArr[i]][2],
-        0};
-    sort(darr, 8);
-    // print(darr, 8);
-    for (j = 1; j <= 8; ++j)
-    {
-      v1 = darr[j];
-      if (judge(vi, v, rankArr[i], v1))
-      {
-        v = v1;
-        vi = rankArr[i];
-        break;
-      }
-    }
-    if (j == 9)
-      return false;
-  }
-  return true;
+return false;
 }
 
 int main()
 {
-  int i, j, k = 0;
-  int i1, i2, i3;
-  while (scanf("%d", &n) > 0 && n > 0)
+  int t = 0, i;
+  int a, b;
+  while (scanf("%d %d", &n, &m) > 0 && n > 0)
   {
-    ++k;
-    for (i = 1; i <= n; ++i)
-      scanf("%lf %lf %lf\n", &scoreArr[i][0], &scoreArr[i][1], &scoreArr[i][2]);
-    for (i = 1; i <= n; ++i)
-      scanf("%d", &rankArr[i]);
-    printf("Case %d: ", k);
-    if (!computed())
-      printf("No solution\n");
-    else
-      printf("%.2lf\n", v);
+    init();
+    for (i = 0; i < m; ++i)
+    {
+      scanf("%d %d", &a, &b);
+      edgeArr[a].push_back(b);
+      edgeArr[b].push_back(a);
+    }
+    setDegree();
+    colorArr[1] = 1;
+    dfs(1, 1);
   }
   return 0;
 }
